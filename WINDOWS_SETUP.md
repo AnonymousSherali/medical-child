@@ -93,6 +93,27 @@ Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
 pip install -r requirements-full.txt
 ```
 
+### Pillow xatosi (KeyError: '__version__')
+**Xato:**
+```
+KeyError: '__version__'
+ERROR: Failed to build 'Pillow' when getting requirements to build wheel
+```
+
+**Yechim:**
+Pillow hozirda ixtiyoriy kutubxona. Agar rasm yuklash kerak bo'lmasa, uni o'rnatmasangiz ham bo'ladi.
+
+**Agar Pillow kerak bo'lsa:**
+```cmd
+# Yangi versiyani o'rnating
+pip install Pillow --upgrade
+
+# Yoki muayyan versiya
+pip install "Pillow>=10.3.0"
+```
+
+**Eslatma:** Loyiha Pillow'siz ham ishlaydi. Rasm yuklash funksiyasi kerak bo'lganda o'rnating.
+
 ### Port band bo'lsa
 ```cmd
 # Boshqa portda ishga tushiring
