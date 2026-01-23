@@ -1,0 +1,167 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{% if object %}Bemorni tahrirlash{% else %}Yangi bemor{% endif %} - NeuroMonitor{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1 class="mb-4">
+            <i class="fas fa-user-plus"></i>
+            {% if object %}Bemorni tahrirlash{% else %}Yangi bemor qo'shish{% endif %}
+        </h1>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-10">
+        <div class="card">
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+
+                    <!-- Asosiy ma'lumotlar -->
+                    <h5 class="border-bottom pb-2 mb-3">Asosiy ma'lumotlar</h5>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Tibbiy karta raqami</label>
+                            {{ form.medical_record_number }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Jinsi</label>
+                            {{ form.gender }}
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Ism</label>
+                            {{ form.first_name }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Familiya</label>
+                            {{ form.last_name }}
+                        </div>
+                    </div>
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label">Tug'ilgan sana va vaqt</label>
+                            {{ form.birth_date }}
+                        </div>
+                    </div>
+
+                    <!-- Tug'ilish parametrlari -->
+                    <h5 class="border-bottom pb-2 mb-3">Tug'ilish parametrlari</h5>
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <label class="form-label">Gestatsion yoshi (hafta)</label>
+                            {{ form.gestational_age }}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Tug'ilish og'irligi (kg)</label>
+                            {{ form.birth_weight }}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Tug'ilish bo'yi (cm)</label>
+                            {{ form.birth_length }}
+                        </div>
+                    </div>
+                    <div class="row mb-4">
+                        <div class="col-md-4">
+                            <label class="form-label">Bosh aylanasi (cm)</label>
+                            {{ form.head_circumference }}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Apgar (1 daqiqa)</label>
+                            {{ form.apgar_score_1min }}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Apgar (5 daqiqa)</label>
+                            {{ form.apgar_score_5min }}
+                        </div>
+                    </div>
+
+                    <!-- Ona ma'lumotlari -->
+                    <h5 class="border-bottom pb-2 mb-3">Ona ma'lumotlari</h5>
+                    <div class="row mb-3">
+                        <div class="col-md-8">
+                            <label class="form-label">Ona FIO</label>
+                            {{ form.mother_name }}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Ona yoshi</label>
+                            {{ form.mother_age }}
+                        </div>
+                    </div>
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label">Ona telefoni</label>
+                            {{ form.mother_phone }}
+                        </div>
+                    </div>
+
+                    <!-- Tibbiy ma'lumotlar -->
+                    <h5 class="border-bottom pb-2 mb-3">Tibbiy ma'lumotlar</h5>
+                    <div class="row mb-3">
+                        <div class="col-12">
+                            <label class="form-label">Tashxis</label>
+                            {{ form.diagnosis }}
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-12">
+                            <label class="form-label">Asoratlar</label>
+                            {{ form.complications }}
+                        </div>
+                    </div>
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <label class="form-label">Davolash rejasi</label>
+                            {{ form.treatment_plan }}
+                        </div>
+                    </div>
+
+                    {% if object %}
+                    <!-- Status (faqat tahrirlashda) -->
+                    <h5 class="border-bottom pb-2 mb-3">Status</h5>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <div class="form-check">
+                                {{ form.is_active }}
+                                <label class="form-check-label" for="{{ form.is_active.id_for_label }}">
+                                    Faol
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Chiqarilgan sana</label>
+                            {{ form.discharge_date }}
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <div class="d-flex justify-content-end gap-2">
+                        <a href="{% url 'patient-list' %}" class="btn btn-secondary">
+                            <i class="fas fa-times"></i> Bekor qilish
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Saqlash
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .form-control, .form-select {
+        border: 1px solid #ced4da;
+        border-radius: 0.25rem;
+        padding: 0.375rem 0.75rem;
+        width: 100%;
+    }
+    textarea.form-control {
+        min-height: 100px;
+    }
+</style>
+{% endblock %}

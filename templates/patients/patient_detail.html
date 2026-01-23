@@ -1,0 +1,174 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ patient }} - NeuroMonitor{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1>
+                <i class="fas fa-user-injured"></i>
+                {{ patient.first_name }} {{ patient.last_name }}
+                {% if patient.is_active %}
+                <span class="badge bg-success">Faol</span>
+                {% else %}
+                <span class="badge bg-secondary">Chiqarilgan</span>
+                {% endif %}
+            </h1>
+            <div>
+                <a href="{% url 'patient-update' patient.pk %}" class="btn btn-warning">
+                    <i class="fas fa-edit"></i> Tahrirlash
+                </a>
+                <a href="{% url 'patient-list' %}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Orqaga
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Asosiy ma'lumotlar -->
+    <div class="col-lg-6">
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Asosiy ma'lumotlar</h5>
+            </div>
+            <div class="card-body">
+                <table class="table table-borderless">
+                    <tr>
+                        <th width="40%">Karta raqami:</th>
+                        <td>{{ patient.medical_record_number }}</td>
+                    </tr>
+                    <tr>
+                        <th>Jinsi:</th>
+                        <td>{{ patient.get_gender_display }}</td>
+                    </tr>
+                    <tr>
+                        <th>Tug'ilgan sana:</th>
+                        <td>{{ patient.birth_date|date:"d.m.Y H:i" }}</td>
+                    </tr>
+                    <tr>
+                        <th>Yoshi:</th>
+                        <td>{{ patient.age_in_days }} kun</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0">Tug'ilish parametrlari</h5>
+            </div>
+            <div class="card-body">
+                <table class="table table-borderless">
+                    <tr>
+                        <th width="40%">Gestatsion yoshi:</th>
+                        <td>{{ patient.gestational_age }} hafta</td>
+                    </tr>
+                    <tr>
+                        <th>Og'irligi:</th>
+                        <td>{{ patient.birth_weight }} kg</td>
+                    </tr>
+                    <tr>
+                        <th>Bo'yi:</th>
+                        <td>{{ patient.birth_length }} cm</td>
+                    </tr>
+                    <tr>
+                        <th>Bosh aylanasi:</th>
+                        <td>{{ patient.head_circumference }} cm</td>
+                    </tr>
+                    <tr>
+                        <th>Apgar (1/5 min):</th>
+                        <td>{{ patient.apgar_score_1min }} / {{ patient.apgar_score_5min }}</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tibbiy ma'lumotlar -->
+    <div class="col-lg-6">
+        <div class="card mb-4">
+            <div class="card-header bg-warning text-dark">
+                <h5 class="mb-0">Ona ma'lumotlari</h5>
+            </div>
+            <div class="card-body">
+                <table class="table table-borderless">
+                    <tr>
+                        <th width="40%">FIO:</th>
+                        <td>{{ patient.mother_name }}</td>
+                    </tr>
+                    <tr>
+                        <th>Yoshi:</th>
+                        <td>{{ patient.mother_age }} yosh</td>
+                    </tr>
+                    <tr>
+                        <th>Telefon:</th>
+                        <td>{{ patient.mother_phone }}</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-header bg-danger text-white">
+                <h5 class="mb-0">Tibbiy ma'lumotlar</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <strong>Tashxis:</strong>
+                    <p>{{ patient.diagnosis|default:"—"|linebreaks }}</p>
+                </div>
+                <div class="mb-3">
+                    <strong>Asoratlar:</strong>
+                    <p>{{ patient.complications|default:"—"|linebreaks }}</p>
+                </div>
+                <div>
+                    <strong>Davolash rejasi:</strong>
+                    <p>{{ patient.treatment_plan|default:"—"|linebreaks }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Tezkor amallar</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3 mb-3">
+                        <a href="#" class="btn btn-outline-primary w-100">
+                            <i class="fas fa-heartbeat fa-2x d-block mb-2"></i>
+                            Monitoring boshlash
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <a href="{% url 'labtest-create' %}" class="btn btn-outline-success w-100">
+                            <i class="fas fa-flask fa-2x d-block mb-2"></i>
+                            Tahlil buyurtmasi
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <a href="#" class="btn btn-outline-info w-100">
+                            <i class="fas fa-chart-line fa-2x d-block mb-2"></i>
+                            Hisobot ko'rish
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <a href="#" class="btn btn-outline-warning w-100">
+                            <i class="fas fa-notes-medical fa-2x d-block mb-2"></i>
+                            Tarix qo'shish
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
