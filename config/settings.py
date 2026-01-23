@@ -25,12 +25,12 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    # Local apps
+    # Local apps - users must be first because other apps use CustomUser
+    'apps.users',
     'apps.patients',
     'apps.monitoring',
     'apps.laboratory',
     'apps.analytics',
-    'apps.users',
 ]
 
 MIDDLEWARE = [

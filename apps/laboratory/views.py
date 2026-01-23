@@ -2,6 +2,7 @@ from django.views.generic import ListView, DetailView, CreateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
 from .models import LabTest, NeuroProteinResult
+from .forms import LabTestForm
 
 
 class LabTestListView(LoginRequiredMixin, ListView):
@@ -22,8 +23,8 @@ class LabTestDetailView(LoginRequiredMixin, DetailView):
 class LabTestCreateView(LoginRequiredMixin, CreateView):
     """Yangi tahlil qo'shish"""
     model = LabTest
+    form_class = LabTestForm
     template_name = 'laboratory/labtest_form.html'
-    fields = ['patient', 'test_type', 'test_date', 'sample_collected_date', 'notes']
     success_url = reverse_lazy('labtest-list')
 
     def form_valid(self, form):
