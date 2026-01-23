@@ -1,0 +1,59 @@
+# ============================================
+# TO'LIQ KUTUBXONALAR (Production uchun)
+# ============================================
+# Bu faylda barcha kutubxonalar bor, shu jumladan:
+# - PostgreSQL
+# - Celery va Redis
+# - Data processing (Pandas, NumPy)
+# - Vizualizatsiya
+# - PDF va Excel export
+
+# Django framework
+Django==4.2.9
+djangorestframework==3.14.0
+
+# Database (PostgreSQL)
+psycopg2-binary==2.9.9
+
+# Asynchronous task processing
+celery==5.3.4
+redis==5.0.1
+
+# Data processing and analytics
+pandas==2.1.4
+numpy==1.26.3
+scipy==1.11.4
+
+# Visualization
+matplotlib==3.8.2
+seaborn==0.13.1
+
+# Forms and validation
+django-crispy-forms==2.1
+crispy-bootstrap5==2.0.0
+
+# Environment variables
+python-decouple==3.8
+
+# Date and time
+python-dateutil==2.8.2
+
+# Excel export
+openpyxl==3.1.2
+xlsxwriter==3.1.9
+
+# PDF generation
+reportlab==4.0.9
+
+# Image processing
+Pillow==10.2.0
+
+# API documentation
+drf-spectacular==0.27.0
+
+# Testing
+pytest==7.4.4
+pytest-django==4.7.0
+
+# Development tools
+django-debug-toolbar==4.2.0
