@@ -252,6 +252,30 @@ pip install -r requirements.txt
 pip install -r requirements-full.txt
 ```
 
+### ❌ Pillow o'rnatish xatosi (Windows)
+
+**Xato:**
+```
+KeyError: '__version__'
+ERROR: Failed to build 'Pillow' when getting requirements to build wheel
+```
+
+**Sabab:** Pillow 10.2.0 versiyasi Windows'da muammoli.
+
+**Yechim 1 (Tavsiya etiladi - Pillow'siz ishlash):**
+Pillow hozirda `requirements.txt` da ixtiyoriy (izoh qilingan). Loyiha Pillow'siz ham ishlaydi. Rasm yuklash kerak bo'lganda o'rnating:
+```bash
+pip install "Pillow>=10.3.0"
+```
+
+**Yechim 2 (Pillow'ni alohida o'rnatish):**
+```bash
+# requirements.txt dan Pillow'ni olib tashlang va alohida o'rnating
+pip install Pillow --upgrade
+```
+
+**Eslatma:** Loyiha asosiy funksiyalari (bemorlar, monitoring, laboratoriya) Pillow'siz ishlaydi.
+
 ### ❌ Migratsiya xatolari
 ```bash
 # Bitta-bitta migratsiya qiling

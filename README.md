@@ -63,10 +63,23 @@ Chala tug'ilgan yangi tug'ilganlar markaziy asab tizimidagi perinatal shikastlan
 ## O'rnatish
 
 ### Talablar
+
+**Minimal (Development):**
+- Python 3.9+
+- SQLite (Python bilan birga keladi)
+- pip va virtualenv
+
+**To'liq (Production):**
 - Python 3.9+
 - PostgreSQL 13+
 - Redis 6+
 - pip va virtualenv
+
+### Requirements fayllar
+
+Loyihada 2 xil requirements fayl mavjud:
+- **requirements.txt** - Asosiy kutubxonalar (Development, SQLite) - **TAVSIYA ETILADI!**
+- **requirements-full.txt** - Barcha kutubxonalar (Production, PostgreSQL, Celery)
 
 ### Bosqichma-bosqich o'rnatish
 
@@ -85,11 +98,25 @@ venv\Scripts\activate  # Windows
 ```
 
 3. Bog'liqliklarni o'rnatish:
+
+**Development uchun (tavsiya etiladi):**
 ```bash
 pip install -r requirements.txt
 ```
 
+**Production uchun:**
+```bash
+pip install -r requirements-full.txt
+```
+
 4. Ma'lumotlar bazasini sozlash:
+
+**Development (SQLite - default):**
+```bash
+# Hech narsa qilish kerak emas, SQLite avtomatik ishlatiladi
+```
+
+**Production (PostgreSQL - ixtiyoriy):**
 ```bash
 # PostgreSQL da yangi baza yarating
 createdb neuromonitor_db
