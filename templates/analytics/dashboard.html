@@ -1,0 +1,159 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Analitika - NeuroMonitor{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1>
+                <i class="fas fa-chart-line"></i> Analitika va Hisobotlar
+            </h1>
+            <a href="{% url 'dashboard' %}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Orqaga
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Statistika Kartalari -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card bg-primary text-white">
+            <div class="card-body">
+                <h5 class="card-title">Jami Bemorlar</h5>
+                <h2>0</h2>
+                <p class="mb-0">
+                    <i class="fas fa-user-injured"></i> Barcha vaqt
+                </p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-success text-white">
+            <div class="card-body">
+                <h5 class="card-title">Tugallangan Tahlillar</h5>
+                <h2>0</h2>
+                <p class="mb-0">
+                    <i class="fas fa-check-circle"></i> Bu oy
+                </p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-warning text-white">
+            <div class="card-body">
+                <h5 class="card-title">Faol Monitoring</h5>
+                <h2>0</h2>
+                <p class="mb-0">
+                    <i class="fas fa-heartbeat"></i> Hozirda
+                </p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-info text-white">
+            <div class="card-body">
+                <h5 class="card-title">O'rtacha Davolanish</h5>
+                <h2>0</h2>
+                <p class="mb-0">
+                    <i class="fas fa-calendar-alt"></i> Kunlar
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Grafik va Trendlar -->
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-chart-area"></i> Bemorlar Dinamikasi
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="text-center text-muted py-5">
+                    <i class="fas fa-chart-line fa-4x mb-3"></i>
+                    <p>Grafik ko'rsatish uchun ma'lumotlar to'planmoqda...</p>
+                    <small>Ma'lumotlar to'plangandan keyin bu yerda trendlar ko'rsatiladi</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-file-export"></i> Hisobotlar
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <button class="btn btn-outline-primary" disabled>
+                        <i class="fas fa-file-pdf"></i> PDF Hisobot
+                    </button>
+                    <button class="btn btn-outline-success" disabled>
+                        <i class="fas fa-file-excel"></i> Excel Export
+                    </button>
+                    <button class="btn btn-outline-info" disabled>
+                        <i class="fas fa-chart-bar"></i> Statistik Tahlil
+                    </button>
+                </div>
+                <hr>
+                <small class="text-muted">
+                    <i class="fas fa-info-circle"></i> Hisobotlar funksiyasi tez orada qo'shiladi
+                </small>
+            </div>
+        </div>
+
+        <div class="card mt-3">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-filter"></i> Filtrlar
+                </h5>
+            </div>
+            <div class="card-body">
+                <form>
+                    <div class="mb-3">
+                        <label class="form-label">Sana oralig'i</label>
+                        <input type="date" class="form-control mb-2" disabled>
+                        <input type="date" class="form-control" disabled>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Tahlil turi</label>
+                        <select class="form-select" disabled>
+                            <option>Barchasi</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100" disabled>
+                        <i class="fas fa-search"></i> Qo'llash
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- So'nggi Faoliyat -->
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-history"></i> So'nggi Faoliyat
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="text-center text-muted py-4">
+                    <i class="fas fa-clipboard-list fa-3x mb-3"></i>
+                    <p>Hozircha faoliyat yo'q</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
