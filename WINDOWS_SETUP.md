@@ -93,6 +93,24 @@ Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
 pip install -r requirements-full.txt
 ```
 
+### crispy-bootstrap5 versiya xatosi
+**Xato:**
+```
+ERROR: No matching distribution found for crispy-bootstrap5==2.0.0
+```
+
+**Sabab:** crispy-bootstrap5 versiyalash tizimi o'zgargan (2024.2, 2024.10 formatda).
+
+**Yechim:**
+Bu xato eski requirements.txt da. Yangi versiyada tuzatilgan. Agar paydo bo'lsa:
+```cmd
+# requirements.txt ni yangilang
+git pull origin claude/update-readme-content-T5XkB
+
+# Yoki qo'lda o'rnating
+pip install crispy-bootstrap5==2024.2
+```
+
 ### Pillow xatosi (KeyError: '__version__')
 **Xato:**
 ```

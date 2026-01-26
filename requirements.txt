@@ -8,7 +8,7 @@ djangorestframework==3.14.0
 
 # Forms and validation
 django-crispy-forms==2.1
-crispy-bootstrap5==2.0.0
+crispy-bootstrap5==2024.2
 
 # Environment variables
 python-decouple==3.8

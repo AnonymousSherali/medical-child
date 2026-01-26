@@ -252,6 +252,25 @@ pip install -r requirements.txt
 pip install -r requirements-full.txt
 ```
 
+### ❌ crispy-bootstrap5 versiya xatosi
+
+**Xato:**
+```
+ERROR: No matching distribution found for crispy-bootstrap5==2.0.0
+```
+
+**Sabab:** crispy-bootstrap5 versiyalash tizimi o'zgargan. Eski format (2.0.0) yo'q, yangi format (2024.2, 2024.10) ishlatiladi.
+
+**Yechim:**
+```bash
+# Yangi versiyani ishlatiladi
+pip install crispy-bootstrap5==2024.2
+
+# Yoki requirements.txt yangilash
+git pull origin claude/update-readme-content-T5XkB
+pip install -r requirements.txt
+```
+
 ### ❌ Pillow o'rnatish xatosi (Windows)
 
 **Xato:**
