@@ -12,7 +12,8 @@ class PatientForm(forms.ModelForm):
             'gestational_age', 'birth_weight', 'birth_length', 'head_circumference',
             'apgar_score_1min', 'apgar_score_5min',
             'mother_name', 'mother_age', 'mother_phone',
-            'diagnosis', 'complications', 'treatment_plan'
+            'diagnosis', 'complications', 'treatment_plan',
+            'is_active', 'discharge_date'
         ]
         widgets = {
             'medical_record_number': forms.TextInput(attrs={'class': 'form-control'}),
@@ -32,6 +33,7 @@ class PatientForm(forms.ModelForm):
             'diagnosis': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
             'complications': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
             'treatment_plan': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
+            'discharge_date': forms.DateTimeInput(attrs={'class': 'form-control', 'type': 'datetime-local'}),
         }
 
     def clean_gestational_age(self):

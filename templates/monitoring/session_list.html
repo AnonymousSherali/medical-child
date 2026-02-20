@@ -42,8 +42,8 @@
                             {% for session in object_list %}
                             <tr>
                                 <td>{{ session.patient }}</td>
-                                <td>{{ session.start_time|date:"d.m.Y H:i" }}</td>
-                                <td>{{ session.end_time|date:"d.m.Y H:i"|default:"—" }}</td>
+                                <td>{{ session.start_date|date:"d.m.Y H:i" }}</td>
+                                <td>{{ session.end_date|date:"d.m.Y H:i"|default:"—" }}</td>
                                 <td>
                                     {% if session.is_active %}
                                     <span class="badge bg-success">Faol</span>
