@@ -25,6 +25,10 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+    # Third-party apps
+    'crispy_forms',
+    'crispy_bootstrap5',
+
     # Local apps - users must be first because other apps use CustomUser
     'apps.users',
     'apps.patients',
@@ -107,6 +111,10 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Custom user model
 AUTH_USER_MODEL = 'users.CustomUser'
+
+# Crispy Forms
+CRISPY_ALLOWED_TEMPLATE_PACKS = 'bootstrap5'
+CRISPY_TEMPLATE_PACK = 'bootstrap5'
 
 # Login/Logout URLs
 LOGIN_URL = 'login'

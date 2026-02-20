@@ -1,0 +1,195 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Tahlil Tafsilotlari - NeuroMonitor{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1>
+                <i class="fas fa-flask"></i> Tahlil Tafsilotlari
+            </h1>
+            <a href="{% url 'labtest-list' %}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Orqaga
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-6">
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Asosiy Ma'lumotlar</h5>
+            </div>
+            <div class="card-body">
+                <table class="table table-borderless">
+                    <tr>
+                        <th width="40%">Bemor:</th>
+                        <td>
+                            <a href="{% url 'patient-detail' test.patient.pk %}">
+                                {{ test.patient }}
+                            </a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Tahlil turi:</th>
+                        <td>{{ test.get_test_type_display }}</td>
+                    </tr>
+                    <tr>
+                        <th>Tahlil sanasi:</th>
+                        <td>{{ test.test_date|date:"d.m.Y H:i" }}</td>
+                    </tr>
+                    <tr>
+                        <th>Namuna olingan:</th>
+                        <td>{{ test.sample_collected_date|date:"d.m.Y H:i" }}</td>
+                    </tr>
+                    <tr>
+                        <th>Holat:</th>
+                        <td>
+                            {% if test.is_completed %}
+                            <span class="badge bg-success">Tugallangan</span>
+                            {% else %}
+                            <span class="badge bg-warning">Jarayonda</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Buyurtma bergan:</th>
+                        <td>{{ test.ordered_by|default:"—" }}</td>
+                    </tr>
+                    {% if test.notes %}
+                    <tr>
+                        <th>Izohlar:</th>
+                        <td>{{ test.notes }}</td>
+                    </tr>
+                    {% endif %}
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-6">
+        <div class="card mb-4">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0">
+                    <i class="fas fa-plus-circle"></i> Natija Qo'shish
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="{% url 'neuroprotein-create' test.pk %}" class="btn btn-outline-primary">
+                        <i class="fas fa-atom"></i> Neyro-oqsil Natijasi (NSE / S100B / GFAP)
+                    </a>
+                    <a href="{% url 'blood-create' test.pk %}" class="btn btn-outline-danger">
+                        <i class="fas fa-tint"></i> Qon Tahlili Natijasi
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Neyro-oqsil natijalari -->
+{% if test.neuro_protein_results.all %}
+<div class="row">
+    <div class="col-12">
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">
+                    <i class="fas fa-atom"></i> Neyro-oqsil Natijalari
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Oqsil turi</th>
+                                <th>Qiymat</th>
+                                <th>O'lchov</th>
+                                <th>Me'yor (min-max)</th>
+                                <th>Holat</th>
+                                <th>Talqin</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for result in test.neuro_protein_results.all %}
+                            <tr>
+                                <td><strong>{{ result.get_protein_type_display }}</strong></td>
+                                <td>{{ result.value }}</td>
+                                <td>{{ result.unit }}</td>
+                                <td>
+                                    {% if result.reference_range_min and result.reference_range_max %}
+                                        {{ result.reference_range_min }} – {{ result.reference_range_max }}
+                                    {% else %}
+                                        —
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if result.is_abnormal %}
+                                    <span class="badge bg-danger">Me'yordan yuqori</span>
+                                    {% else %}
+                                    <span class="badge bg-success">Me'yorda</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ result.interpretation|default:"—" }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Qon tahlili natijalari -->
+{% if test.blood_test_results.all %}
+<div class="row">
+    <div class="col-12">
+        <div class="card mb-4">
+            <div class="card-header bg-danger text-white">
+                <h5 class="mb-0">
+                    <i class="fas fa-tint"></i> Qon Tahlili Natijalari
+                </h5>
+            </div>
+            <div class="card-body">
+                {% for result in test.blood_test_results.all %}
+                <div class="table-responsive">
+                    <table class="table table-bordered">
+                        <tr>
+                            <th width="30%">Gemoglobin (g/L)</th>
+                            <td>{{ result.hemoglobin|default:"—" }}</td>
+                            <th width="30%">Eritrotsitlar (10¹²/L)</th>
+                            <td>{{ result.rbc|default:"—" }}</td>
+                        </tr>
+                        <tr>
+                            <th>Leykotsitlar (10⁹/L)</th>
+                            <td>{{ result.wbc|default:"—" }}</td>
+                            <th>Trombotsitlar (10⁹/L)</th>
+                            <td>{{ result.platelets|default:"—" }}</td>
+                        </tr>
+                        <tr>
+                            <th>Glyukoza (mmol/L)</th>
+                            <td>{{ result.glucose|default:"—" }}</td>
+                            <th>Kreatinin (µmol/L)</th>
+                            <td>{{ result.creatinine|default:"—" }}</td>
+                        </tr>
+                        <tr>
+                            <th>Bilirubin (µmol/L)</th>
+                            <td>{{ result.bilirubin|default:"—" }}</td>
+                            <th>Izohlar</th>
+                            <td>{{ result.notes|default:"—" }}</td>
+                        </tr>
+                    </table>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
