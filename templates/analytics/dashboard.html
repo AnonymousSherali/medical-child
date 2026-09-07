@@ -1,157 +1,203 @@
 {% extends 'base.html' %}
-{% load static %}
 
 {% block title %}Analitika - NeuroMonitor{% endblock %}
 
 {% block content %}
-<div class="row">
-    <div class="col-12">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h1>
-                <i class="fas fa-chart-line"></i> Analitika va Hisobotlar
-            </h1>
-            <a href="{% url 'dashboard' %}" class="btn btn-secondary">
-                <i class="fas fa-arrow-left"></i> Orqaga
-            </a>
-        </div>
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+    <h1 class="mb-0"><i class="fas fa-chart-line"></i> Analitika va hisobotlar</h1>
+    <div class="d-flex gap-2">
+        <a href="{% url 'report-list' %}" class="btn btn-outline-primary">
+            <i class="fas fa-file-alt"></i> Hisobotlar
+        </a>
+        <a href="{% url 'dashboard' %}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Orqaga
+        </a>
     </div>
 </div>
 
-<!-- Statistika Kartalari -->
-<div class="row mb-4">
+<div class="row g-3 mb-4">
     <div class="col-md-3">
-        <div class="card bg-primary text-white">
+        <div class="card bg-primary text-white h-100">
             <div class="card-body">
-                <h5 class="card-title">Jami Bemorlar</h5>
-                <h2>0</h2>
-                <p class="mb-0">
-                    <i class="fas fa-user-injured"></i> Barcha vaqt
-                </p>
+                <h6 class="card-title">Jami bemorlar</h6>
+                <h2 class="mb-0">{{ total_patients }}</h2>
+                <small><i class="fas fa-user-injured"></i> {{ active_patients }} ta faol</small>
             </div>
         </div>
     </div>
     <div class="col-md-3">
-        <div class="card bg-success text-white">
+        <div class="card bg-success text-white h-100">
             <div class="card-body">
-                <h5 class="card-title">Tugallangan Tahlillar</h5>
-                <h2>0</h2>
-                <p class="mb-0">
-                    <i class="fas fa-check-circle"></i> Bu oy
-                </p>
+                <h6 class="card-title">Tugallangan tahlillar</h6>
+                <h2 class="mb-0">{{ completed_tests }}</h2>
+                <small><i class="fas fa-hourglass-half"></i> {{ pending_tests }} ta jarayonda</small>
             </div>
         </div>
     </div>
     <div class="col-md-3">
-        <div class="card bg-warning text-white">
+        <div class="card bg-danger text-white h-100">
             <div class="card-body">
-                <h5 class="card-title">Faol Monitoring</h5>
-                <h2>0</h2>
-                <p class="mb-0">
-                    <i class="fas fa-heartbeat"></i> Hozirda
-                </p>
+                <h6 class="card-title">Chetlashgan natijalar</h6>
+                <h2 class="mb-0">{{ abnormal_results }}</h2>
+                <small><i class="fas fa-vials"></i> {{ total_results }} ta natijadan</small>
             </div>
         </div>
     </div>
     <div class="col-md-3">
-        <div class="card bg-info text-white">
+        <div class="card bg-info text-white h-100">
             <div class="card-body">
-                <h5 class="card-title">O'rtacha Davolanish</h5>
-                <h2>0</h2>
-                <p class="mb-0">
-                    <i class="fas fa-calendar-alt"></i> Kunlar
-                </p>
+                <h6 class="card-title">Faol monitoring</h6>
+                <h2 class="mb-0">{{ active_sessions }}</h2>
+                <small><i class="fas fa-heartbeat"></i> {{ total_sessions }} ta sessiyadan</small>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Grafik va Trendlar -->
 <div class="row">
     <div class="col-lg-8">
-        <div class="card">
+        <div class="card mb-4">
             <div class="card-header">
-                <h5 class="mb-0">
-                    <i class="fas fa-chart-area"></i> Bemorlar Dinamikasi
-                </h5>
+                <h5 class="mb-0"><i class="fas fa-notes-medical"></i> Klinik ko'rsatkichlar</h5>
             </div>
             <div class="card-body">
-                <div class="text-center text-muted py-5">
-                    <i class="fas fa-chart-line fa-4x mb-3"></i>
-                    <p>Grafik ko'rsatish uchun ma'lumotlar to'planmoqda...</p>
-                    <small>Ma'lumotlar to'plangandan keyin bu yerda trendlar ko'rsatiladi</small>
+                <div class="row text-center g-3">
+                    <div class="col-md-4">
+                        <div class="border rounded p-3">
+                            <div class="fs-3 fw-bold text-primary">
+                                {{ avg_gestational_age|floatformat:1|default:"—" }}
+                            </div>
+                            <small class="text-muted">O'rtacha gestatsion yosh (hafta)</small>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="border rounded p-3">
+                            <div class="fs-3 fw-bold text-primary">
+                                {{ avg_birth_weight|floatformat:2|default:"—" }}
+                            </div>
+                            <small class="text-muted">O'rtacha tug'ilish og'irligi (kg)</small>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="border rounded p-3">
+                            <div class="fs-3 fw-bold text-warning">{{ preterm_patients }}</div>
+                            <small class="text-muted">Chala tug'ilgan (&lt; 37 hafta)</small>
+                        </div>
+                    </div>
                 </div>
+            </div>
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-atom"></i> Neyro-oqsillar bo'yicha taqsimot</h5>
+            </div>
+            <div class="card-body">
+                {% if protein_stats %}
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Oqsil</th>
+                                <th>Jami</th>
+                                <th>Chetlashgan</th>
+                                <th>O'rtacha qiymat</th>
+                                <th style="width: 30%">Chetlashish ulushi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for stat in protein_stats %}
+                            <tr>
+                                <td><strong>{{ stat.label }}</strong></td>
+                                <td>{{ stat.total }}</td>
+                                <td>{{ stat.abnormal }}</td>
+                                <td>{{ stat.average|floatformat:3|default:"—" }}</td>
+                                <td>
+                                    {% widthratio stat.abnormal stat.total 100 as percent %}
+                                    <div class="progress" style="height: 20px;">
+                                        <div class="progress-bar bg-danger" role="progressbar"
+                                             style="width: {{ percent }}%"
+                                             aria-valuenow="{{ percent }}" aria-valuemin="0" aria-valuemax="100">
+                                            {{ percent }}%
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-muted text-center mb-0 py-4">
+                    Neyro-oqsil natijalari kiritilgandan so'ng taqsimot shu yerda ko'rsatiladi
+                </p>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-history"></i> So'nggi tahlillar</h5>
+            </div>
+            <div class="card-body">
+                {% if recent_tests %}
+                <div class="list-group list-group-flush">
+                    {% for test in recent_tests %}
+                    <a href="{% url 'labtest-detail' test.pk %}"
+                       class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                        <span>{{ test.patient.full_name }} — {{ test.get_test_type_display }}</span>
+                        <small class="text-muted">{{ test.test_date|date:"d.m.Y H:i" }}</small>
+                    </a>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="text-muted text-center mb-0 py-3">Hozircha tahlillar yo'q</p>
+                {% endif %}
             </div>
         </div>
     </div>
 
     <div class="col-lg-4">
-        <div class="card">
+        <div class="card mb-4">
             <div class="card-header">
-                <h5 class="mb-0">
-                    <i class="fas fa-file-export"></i> Hisobotlar
-                </h5>
+                <h5 class="mb-0"><i class="fas fa-file-export"></i> Eksport</h5>
             </div>
             <div class="card-body">
                 <div class="d-grid gap-2">
-                    <button class="btn btn-outline-primary" disabled>
-                        <i class="fas fa-file-pdf"></i> PDF Hisobot
-                    </button>
-                    <button class="btn btn-outline-success" disabled>
-                        <i class="fas fa-file-excel"></i> Excel Export
-                    </button>
-                    <button class="btn btn-outline-info" disabled>
-                        <i class="fas fa-chart-bar"></i> Statistik Tahlil
-                    </button>
+                    <a href="{% url 'export-patients' %}" class="btn btn-outline-success">
+                        <i class="fas fa-file-csv"></i> Bemorlar (CSV)
+                    </a>
+                    <a href="{% url 'export-neuroprotein' %}" class="btn btn-outline-primary">
+                        <i class="fas fa-file-csv"></i> Neyro-oqsillar (CSV)
+                    </a>
                 </div>
                 <hr>
                 <small class="text-muted">
-                    <i class="fas fa-info-circle"></i> Hisobotlar funksiyasi tez orada qo'shiladi
+                    <i class="fas fa-info-circle"></i>
+                    CSV fayllar Excel'da to'g'ridan-to'g'ri ochiladi.
                 </small>
             </div>
         </div>
 
-        <div class="card mt-3">
-            <div class="card-header">
-                <h5 class="mb-0">
-                    <i class="fas fa-filter"></i> Filtrlar
-                </h5>
-            </div>
-            <div class="card-body">
-                <form>
-                    <div class="mb-3">
-                        <label class="form-label">Sana oralig'i</label>
-                        <input type="date" class="form-control mb-2" disabled>
-                        <input type="date" class="form-control" disabled>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Tahlil turi</label>
-                        <select class="form-select" disabled>
-                            <option>Barchasi</option>
-                        </select>
-                    </div>
-                    <button type="submit" class="btn btn-primary w-100" disabled>
-                        <i class="fas fa-search"></i> Qo'llash
-                    </button>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- So'nggi Faoliyat -->
-<div class="row mt-4">
-    <div class="col-12">
         <div class="card">
             <div class="card-header">
-                <h5 class="mb-0">
-                    <i class="fas fa-history"></i> So'nggi Faoliyat
-                </h5>
+                <h5 class="mb-0"><i class="fas fa-file-alt"></i> So'nggi hisobotlar</h5>
             </div>
             <div class="card-body">
-                <div class="text-center text-muted py-4">
-                    <i class="fas fa-clipboard-list fa-3x mb-3"></i>
-                    <p>Hozircha faoliyat yo'q</p>
+                {% if recent_reports %}
+                <div class="list-group list-group-flush">
+                    {% for report in recent_reports %}
+                    <a href="{% url 'report-detail' report.pk %}" class="list-group-item list-group-item-action">
+                        <div class="d-flex justify-content-between">
+                            <span>{{ report.title|truncatechars:28 }}</span>
+                            <small class="text-muted">{{ report.created_at|date:"d.m.Y" }}</small>
+                        </div>
+                    </a>
+                    {% endfor %}
                 </div>
+                {% else %}
+                <p class="text-muted text-center mb-0 py-3">Hisobotlar yo'q</p>
+                {% endif %}
             </div>
         </div>
     </div>

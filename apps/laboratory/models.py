@@ -77,6 +77,16 @@ class LabTest(models.Model):
     def __str__(self):
         return f"{self.patient} - {self.get_test_type_display()} ({self.test_date.strftime('%Y-%m-%d')})"
 
+    def get_absolute_url(self):
+        from django.urls import reverse
+
+        return reverse('labtest-detail', kwargs={'pk': self.pk})
+
+    @property
+    def has_abnormal_results(self):
+        """Tahlilda me'yordan chetlashgan natija bormi."""
+        return self.neuro_protein_results.filter(is_abnormal=True).exists()
+
 
 class NeuroProteinResult(models.Model):
     """
@@ -146,12 +156,16 @@ class NeuroProteinResult(models.Model):
         return f"{self.get_protein_type_display()}: {self.value} {self.unit}"
 
     def save(self, *args, **kwargs):
-        # Avtomatik me'yordan chetlashganligini tekshirish
-        if self.reference_range_min and self.reference_range_max:
-            if self.value < self.reference_range_min or self.value > self.reference_range_max:
-                self.is_abnormal = True
-            else:
-                self.is_abnormal = False
+        # Me'yordan chetlashganligini avtomatik aniqlash.
+        # `is not None` ishlatiladi, chunki 0 ham to'g'ri me'yoriy chegara
+        # bo'lishi mumkin — avvalgi `if min and max` uni e'tiborsiz qoldirardi.
+        # Bitta chegara berilgan holat ham qo'llab-quvvatlanadi.
+        low = self.reference_range_min
+        high = self.reference_range_max
+        if self.value is not None and (low is not None or high is not None):
+            below = low is not None and self.value < low
+            above = high is not None and self.value > high
+            self.is_abnormal = below or above
         super().save(*args, **kwargs)
 
 

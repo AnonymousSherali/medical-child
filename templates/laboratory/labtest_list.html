@@ -1,88 +1,105 @@
 {% extends 'base.html' %}
-{% load static %}
 
-{% block title %}Laboratoriya Tahlillari - NeuroMonitor{% endblock %}
+{% block title %}Laboratoriya tahlillari - NeuroMonitor{% endblock %}
 
 {% block content %}
-<div class="row">
-    <div class="col-12">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h1>
-                <i class="fas fa-flask"></i> Laboratoriya Tahlillari
-            </h1>
-            <div>
-                <a href="{% url 'labtest-create' %}" class="btn btn-primary">
-                    <i class="fas fa-plus"></i> Yangi tahlil
-                </a>
-                <a href="{% url 'dashboard' %}" class="btn btn-secondary">
-                    <i class="fas fa-arrow-left"></i> Orqaga
-                </a>
-            </div>
-        </div>
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+    <h1 class="mb-0"><i class="fas fa-flask"></i> Laboratoriya tahlillari</h1>
+    <div class="d-flex gap-2">
+        <a href="{% url 'neuroprotein-list' %}" class="btn btn-outline-primary">
+            <i class="fas fa-atom"></i> Neyro-oqsil natijalari
+        </a>
+        <a href="{% url 'labtest-create' %}" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Yangi tahlil
+        </a>
     </div>
 </div>
 
-<div class="row">
-    <div class="col-12">
-        <div class="card">
-            <div class="card-header">
-                <h5 class="mb-0">
-                    <i class="fas fa-list"></i> Barcha Tahlillar
-                </h5>
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="get" class="row g-2 align-items-end">
+            <div class="col-md-4">
+                <label class="form-label">Tahlil turi</label>
+                <select name="test_type" class="form-select">
+                    <option value="">Barchasi</option>
+                    {% for value, label in test_types %}
+                    <option value="{{ value }}" {% if selected_type == value %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
             </div>
-            <div class="card-body">
-                {% if tests %}
-                <div class="table-responsive">
-                    <table class="table table-hover">
-                        <thead>
-                            <tr>
-                                <th>Bemor</th>
-                                <th>Tahlil turi</th>
-                                <th>Tahlil sanasi</th>
-                                <th>Namuna olingan</th>
-                                <th>Holat</th>
-                                <th>Amallar</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for test in tests %}
-                            <tr>
-                                <td>
-                                    <a href="{% url 'patient-detail' test.patient.pk %}">
-                                        {{ test.patient }}
-                                    </a>
-                                </td>
-                                <td>{{ test.get_test_type_display }}</td>
-                                <td>{{ test.test_date|date:"d.m.Y H:i" }}</td>
-                                <td>{{ test.sample_collected_date|date:"d.m.Y H:i" }}</td>
-                                <td>
-                                    {% if test.is_completed %}
-                                    <span class="badge bg-success">Tugallangan</span>
-                                    {% else %}
-                                    <span class="badge bg-warning">Jarayonda</span>
-                                    {% endif %}
-                                </td>
-                                <td>
-                                    <a href="#" class="btn btn-sm btn-info">
-                                        <i class="fas fa-eye"></i>
-                                    </a>
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-                {% else %}
-                <div class="text-center text-muted py-5">
-                    <i class="fas fa-flask fa-4x mb-3"></i>
-                    <p>Hozircha tahlillar yo'q</p>
-                    <a href="{% url 'labtest-create' %}" class="btn btn-primary">
-                        <i class="fas fa-plus"></i> Birinchi tahlilni qo'shish
-                    </a>
-                </div>
-                {% endif %}
+            <div class="col-md-4">
+                <label class="form-label">Holat</label>
+                <select name="status" class="form-select">
+                    <option value="">Barchasi</option>
+                    <option value="completed" {% if selected_status == 'completed' %}selected{% endif %}>Tugallangan</option>
+                    <option value="pending" {% if selected_status == 'pending' %}selected{% endif %}>Jarayonda</option>
+                </select>
             </div>
+            <div class="col-md-4 d-flex gap-2">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-filter"></i> Filtrlash
+                </button>
+                <a href="{% url 'labtest-list' %}" class="btn btn-outline-secondary">Tozalash</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        {% if tests %}
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Bemor</th>
+                        <th>Tahlil turi</th>
+                        <th>Tahlil sanasi</th>
+                        <th>Namuna olingan</th>
+                        <th>Holat</th>
+                        <th>Amallar</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for test in tests %}
+                    <tr>
+                        <td>
+                            <a href="{% url 'patient-detail' test.patient.pk %}">
+                                {{ test.patient.full_name }}
+                            </a>
+                        </td>
+                        <td>{{ test.get_test_type_display }}</td>
+                        <td>{{ test.test_date|date:"d.m.Y H:i" }}</td>
+                        <td>{{ test.sample_collected_date|date:"d.m.Y H:i" }}</td>
+                        <td>
+                            {% if test.is_completed %}
+                            <span class="badge bg-success">Tugallangan</span>
+                            {% else %}
+                            <span class="badge bg-warning">Jarayonda</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="{% url 'labtest-detail' test.pk %}" class="btn btn-sm btn-info">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
+
+        {% include 'includes/pagination.html' %}
+
+        {% else %}
+        <div class="text-center text-muted py-5">
+            <i class="fas fa-flask fa-4x mb-3"></i>
+            <p>Tahlillar topilmadi</p>
+            <a href="{% url 'labtest-create' %}" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Yangi tahlil qo'shish
+            </a>
+        </div>
+        {% endif %}
     </div>
 </div>
 {% endblock %}

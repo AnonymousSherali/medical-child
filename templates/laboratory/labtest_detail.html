@@ -85,6 +85,15 @@
                     <a href="{% url 'blood-create' test.pk %}" class="btn btn-outline-danger">
                         <i class="fas fa-tint"></i> Qon Tahlili Natijasi
                     </a>
+                    {% if not test.is_completed %}
+                    <hr class="my-2">
+                    <form method="post" action="{% url 'labtest-complete' test.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-success w-100">
+                            <i class="fas fa-check-circle"></i> Tugallangan deb belgilash
+                        </button>
+                    </form>
+                    {% endif %}
                 </div>
             </div>
         </div>
@@ -121,7 +130,7 @@
                                 <td>{{ result.value }}</td>
                                 <td>{{ result.unit }}</td>
                                 <td>
-                                    {% if result.reference_range_min and result.reference_range_max %}
+                                    {% if result.reference_range_min is not None and result.reference_range_max is not None %}
                                         {{ result.reference_range_min }} – {{ result.reference_range_max }}
                                     {% else %}
                                         —

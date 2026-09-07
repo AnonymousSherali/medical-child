@@ -77,7 +77,7 @@ pip install -r requirements-full.txt
 
 ### 4. Migratsiyalarni bajarish
 ```bash
-python manage.py makemigrations
+# Migratsiyalar repoda mavjud, shuning uchun faqat migrate yetarli
 python manage.py migrate
 ```
 
@@ -220,6 +220,13 @@ python manage.py createsuperuser
 - Static fayllarni to'plang: `python manage.py collectstatic`
 - Gunicorn yoki uWSGI ishlatiladi
 - Nginx reverse proxy
+
+## Avtomatik testlar
+
+```bash
+python manage.py test                 # barchasi (39 ta)
+python manage.py test apps.patients   # bitta app
+```
 
 ## Test ma'lumotlar
 

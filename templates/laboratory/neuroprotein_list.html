@@ -1,0 +1,109 @@
+{% extends 'base.html' %}
+
+{% block title %}Neyro-oqsil natijalari - NeuroMonitor{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+    <h1 class="mb-0"><i class="fas fa-atom"></i> Neyro-oqsil natijalari</h1>
+    <div class="d-flex gap-2">
+        <a href="{% url 'export-neuroprotein' %}" class="btn btn-outline-success">
+            <i class="fas fa-file-csv"></i> CSV yuklab olish
+        </a>
+        <a href="{% url 'labtest-list' %}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Tahlillar
+        </a>
+    </div>
+</div>
+
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="get" class="row g-2 align-items-end">
+            <div class="col-md-4">
+                <label class="form-label">Oqsil turi</label>
+                <select name="protein_type" class="form-select">
+                    <option value="">Barchasi</option>
+                    {% for value, label in protein_types %}
+                    <option value="{{ value }}" {% if selected_protein == value %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-4">
+                <div class="form-check mt-4">
+                    <input class="form-check-input" type="checkbox" name="abnormal" value="1"
+                           id="abnormalOnly" {% if abnormal_only %}checked{% endif %}>
+                    <label class="form-check-label" for="abnormalOnly">
+                        Faqat me'yordan chetlashganlar
+                    </label>
+                </div>
+            </div>
+            <div class="col-md-4 d-flex gap-2">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-filter"></i> Filtrlash
+                </button>
+                <a href="{% url 'neuroprotein-list' %}" class="btn btn-outline-secondary">Tozalash</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        {% if results %}
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Bemor</th>
+                        <th>Oqsil turi</th>
+                        <th>Qiymat</th>
+                        <th>Me'yor</th>
+                        <th>Holat</th>
+                        <th>Sana</th>
+                        <th>Tahlil</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for result in results %}
+                    <tr>
+                        <td>
+                            <a href="{% url 'patient-detail' result.lab_test.patient.pk %}">
+                                {{ result.lab_test.patient.full_name }}
+                            </a>
+                        </td>
+                        <td><strong>{{ result.get_protein_type_display }}</strong></td>
+                        <td>{{ result.value }} {{ result.unit }}</td>
+                        <td>
+                            {% if result.reference_range_min is not None and result.reference_range_max is not None %}
+                                {{ result.reference_range_min }} – {{ result.reference_range_max }}
+                            {% else %}—{% endif %}
+                        </td>
+                        <td>
+                            {% if result.is_abnormal %}
+                            <span class="badge bg-danger">Chetlashgan</span>
+                            {% else %}
+                            <span class="badge bg-success">Me'yorda</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ result.created_at|date:"d.m.Y H:i" }}</td>
+                        <td>
+                            <a href="{% url 'labtest-detail' result.lab_test.pk %}" class="btn btn-sm btn-info">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        {% include 'includes/pagination.html' %}
+
+        {% else %}
+        <div class="text-center text-muted py-5">
+            <i class="fas fa-atom fa-4x mb-3"></i>
+            <p>Natijalar topilmadi</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

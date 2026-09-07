@@ -11,54 +11,67 @@ Chala tug'ilgan yangi tug'ilganlar markaziy asab tizimidagi perinatal shikastlan
 ## Asosiy imkoniyatlar
 
 ### 1. Bemor ma'lumotlarini boshqarish
-- Yangi tug'ilganlarning shaxsiy ma'lumotlarini ro'yxatga olish
-- Tug'ilish tarixi, gestatsion yoshi, og'irligi va boshqa parametrlarni saqlash
-- Bemor tarixi va tibbiy hujjatlarni yuritish
+- Yangi tug'ilganlarni ro'yxatga olish (karta raqami, jinsi, tug'ilgan sana)
+- Tug'ilish parametrlari: gestatsion yoshi, og'irligi, bo'yi, bosh aylanasi, Apgar
+- Ona ma'lumotlari va tibbiy tarix yuritish
+- Ism, familiya, karta raqami bo'yicha qidiruv va status filtri
+- Chala tug'ilganlarni avtomatik belgilash (< 37 hafta)
 
-### 2. Real-time monitoring tizimi
-- Laboratoriya tahlillar natijalarini real vaqt rejimida kiritish
-- Neyro-spetsifik oqsillar (NSE, S100B, GFAP) ko'rsatkichlarini kuzatish
-- Vital signs (yurak urishi, nafas olish, qon bosimi) monitoringi
-- Avtomatik ogohlantirish tizimi (kritik ko'rsatkichlar bo'yicha)
+### 2. Monitoring tizimi
+- Bemor uchun monitoring sessiyasini boshlash va yakunlash
+- Hayotiy ko'rsatkichlar: yurak urishi, nafas olish, harorat, qon bosimi, SpO2
+- Nevrologik baholash: ong darajasi, mushak tonusi, reflekslar, tutqanoq faolligi
+- Kiritilgan qiymatlarni fiziologik chegaralar bo'yicha tekshirish
 
-### 3. Laboratoriya integratsiyasi
-- Laboratoriya natijalarini avtomatik import qilish
-- Ma'lumotlarni standartlashtirish va validatsiya qilish
-- Tahlil natijalarini me'yoriy qiymatlar bilan solishtirish
+### 3. Laboratoriya
+- Tahlil buyurtmalarini yaratish va holatini kuzatish
+- Neyro-spetsifik oqsillar natijalari: NSE, S100B, GFAP
+- Me'yoriy diapazon asosida chetlashishni avtomatik aniqlash
+- Qon tahlili ko'rsatkichlari: Hb, RBC, WBC, PLT, glyukoza, kreatinin, bilirubin
+- Tur va holat bo'yicha filtrlash
 
 ### 4. Analitika va hisobotlar
-- Bemorlarning holatini dinamikada kuzatish
-- Statistik tahlillar va trендlar ko'rsatkichlari
-- Neyro-spetsifik oqsillar o'zgarishining grafik tasviri
-- Klinik hisobotlarni avtomatik generatsiya qilish
-- Excel/PDF formatda eksport qilish
+- Umumiy ko'rsatkichlar: bemorlar, tahlillar, chetlashgan natijalar, faol monitoring
+- Klinik o'rtachalar: gestatsion yosh, tug'ilish og'irligi, chala tug'ilganlar soni
+- Neyro-oqsillar bo'yicha taqsimot va chetlashish ulushi
+- CSV eksport (Excel'da ochiladi): bemorlar va neyro-oqsil natijalari
 
-### 5. Prognozlash moduli
-- Sun'iy intellekt asosida xavf darajasini baholash
-- Nevrologik komplikatsiyalar ehtimolini hisoblash
-- Davolash natijalarini bashorat qilish
+### 5. Foydalanuvchilar va xavfsizlik
+- Rolga asoslangan hisoblar: shifokor, hamshira, laborant, administrator
+- Barcha sahifalar autentifikatsiya talab qiladi
+- CSRF, XSS va SQL injection himoyasi (Django standart mexanizmlari)
+- Admin panel barcha modellar uchun sozlangan
+
+### Rejadagi imkoniyatlar (hozircha amalga oshirilmagan)
+- PDF formatda hisobot generatsiyasi
+- Grafik/diagrammalar (Chart.js)
+- Celery orqali fon vazifalari va avtomatik ogohlantirishlar
+- Sun'iy intellekt asosida xavf darajasini prognozlash
+- Laboratoriya tizimlaridan avtomatik import (REST API)
 
 ## Texnologiyalar
 
-### Backend
-- **Django 4.x** - asosiy web framework
+### Hozirda ishlatilayotgan
+- **Django 4.2** - asosiy web framework
+- **SQLite** - development ma'lumotlar bazasi (PostgreSQL ixtiyoriy)
+- **django-crispy-forms + crispy-bootstrap5** - forma renderi
+- **Bootstrap 5** - responsive dizayn (CDN)
+- **Font Awesome 6** - ikonkalar (CDN)
+
+### Ixtiyoriy / production uchun
+- **PostgreSQL** - production ma'lumotlar bazasi (`requirements-full.txt`)
 - **Django REST Framework** - RESTful API
-- **PostgreSQL** - ma'lumotlar bazasi
-- **Celery** - asinxron vazifalar (hisobotlar, export)
-- **Redis** - kesh va xabarlar navbati
+- **Celery + Redis** - asinxron vazifalar
+- **Pandas / NumPy / SciPy** - kengaytirilgan statistik tahlil
+- **Matplotlib / Seaborn** - vizualizatsiya
 
-### Frontend
-- **HTML5/CSS3** - markup va stillar
-- **Bootstrap 5** - responsive dizayn
-- **JavaScript/jQuery** - interaktiv interfeys
-- **Chart.js** - grafik va diagrammalar
-- **DataTables** - jadvallar bilan ishlash
+## Testlar
 
-### Ma'lumotlar tahlili
-- **Pandas** - ma'lumotlarni qayta ishlash
-- **NumPy** - raqamli hisoblashlar
-- **SciPy** - statistik tahlil
-- **Matplotlib/Seaborn** - vizualizatsiya
+```bash
+python manage.py test
+```
+
+39 ta test: modellar, forma validatsiyasi, view'lar va admin sahifalari.
 
 ## O'rnatish
 
