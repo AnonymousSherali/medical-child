@@ -1,5 +1,7 @@
-from django.db import models
 from django.conf import settings
+from django.core.validators import MaxValueValidator, MinValueValidator
+from django.db import models
+from django.urls import reverse
 
 
 class Patient(models.Model):
@@ -37,7 +39,8 @@ class Patient(models.Model):
     # Tug'ilish parametrlari
     gestational_age = models.IntegerField(
         verbose_name='Gestatsion yoshi (hafta)',
-        help_text='Homiladorlik muddati haftalarda'
+        help_text='Homiladorlik muddati haftalarda',
+        validators=[MinValueValidator(20), MaxValueValidator(44)]
     )
     birth_weight = models.DecimalField(
         max_digits=5,
@@ -56,11 +59,13 @@ class Patient(models.Model):
     )
     apgar_score_1min = models.IntegerField(
         verbose_name='Apgar (1 daqiqa)',
-        help_text='Apgar ko\'rsatkichi 1 daqiqada'
+        help_text='Apgar ko\'rsatkichi 1 daqiqada',
+        validators=[MinValueValidator(0), MaxValueValidator(10)]
     )
     apgar_score_5min = models.IntegerField(
         verbose_name='Apgar (5 daqiqa)',
-        help_text='Apgar ko\'rsatkichi 5 daqiqada'
+        help_text='Apgar ko\'rsatkichi 5 daqiqada',
+        validators=[MinValueValidator(0), MaxValueValidator(10)]
     )
 
     # Ona ma'lumotlari
@@ -126,18 +131,39 @@ class Patient(models.Model):
         verbose_name = 'Bemor'
         verbose_name_plural = 'Bemorlar'
         ordering = ['-created_at']
+        indexes = [
+            models.Index(fields=['is_active']),
+            models.Index(fields=['last_name', 'first_name']),
+        ]
 
     def __str__(self):
         return f"{self.first_name} {self.last_name} ({self.medical_record_number})"
 
+    def get_absolute_url(self):
+        return reverse('patient-detail', kwargs={'pk': self.pk})
+
+    @property
+    def full_name(self):
+        return f"{self.first_name} {self.last_name}"
+
     @property
     def age_in_days(self):
-        """Bemorning yoshi kunlarda"""
+        """Bemorning yoshi kunlarda.
+
+        Chiqarilgan bemorlar uchun chiqarish sanasidagi yoshi qaytariladi,
+        faol bemorlar uchun esa bugungi yoshi.
+        """
         from django.utils import timezone
-        if self.is_active and not self.discharge_date:
-            delta = timezone.now() - self.birth_date
-            return delta.days
-        return None
+
+        if not self.birth_date:
+            return None
+        end = self.discharge_date or timezone.now()
+        return (end - self.birth_date).days
+
+    @property
+    def is_preterm(self):
+        """37 haftadan erta tug'ilganmi (chala tug'ilgan)."""
+        return self.gestational_age is not None and self.gestational_age < 37
 
 
 class MedicalHistory(models.Model):

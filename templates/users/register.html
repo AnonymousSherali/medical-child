@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Ro'yxatdan o'tish - NeuroMonitor{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+        <div class="card shadow mt-4">
+            <div class="card-body p-4">
+                <div class="text-center mb-4">
+                    <i class="fas fa-user-plus fa-3x text-primary"></i>
+                    <h2 class="mt-3">Ro'yxatdan o'tish</h2>
+                    <p class="text-muted">Yangi xodim hisobini yarating</p>
+                </div>
+
+                <form method="post" novalidate>
+                    {% csrf_token %}
+                    {{ form|crispy }}
+                    <div class="d-grid mt-3">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="fas fa-user-check"></i> Ro'yxatdan o'tish
+                        </button>
+                    </div>
+                </form>
+
+                <hr class="my-4">
+                <p class="text-center mb-0">
+                    Hisobingiz bormi? <a href="{% url 'login' %}">Kirish</a>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

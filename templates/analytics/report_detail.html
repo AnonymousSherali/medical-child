@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ report.title }} - NeuroMonitor{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="mb-0"><i class="fas fa-file-alt"></i> {{ report.title }}</h1>
+    <a href="{% url 'report-list' %}" class="btn btn-secondary">
+        <i class="fas fa-arrow-left"></i> Orqaga
+    </a>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Hisobot ma'lumotlari</h5>
+            </div>
+            <div class="card-body">
+                <table class="table table-borderless mb-0">
+                    <tr>
+                        <th width="35%">Turi:</th>
+                        <td>{{ report.get_report_type_display }}</td>
+                    </tr>
+                    <tr>
+                        <th>Bemor:</th>
+                        <td>
+                            {% if report.patient %}
+                            <a href="{% url 'patient-detail' report.patient.pk %}">{{ report.patient }}</a>
+                            {% else %}Barcha bemorlar{% endif %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Davr:</th>
+                        <td>
+                            {% if report.date_from and report.date_to %}
+                                {{ report.date_from|date:"d.m.Y" }} – {{ report.date_to|date:"d.m.Y" }}
+                            {% else %}Belgilanmagan{% endif %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Fayl turi:</th>
+                        <td>{{ report.get_file_type_display }}</td>
+                    </tr>
+                    <tr>
+                        <th>Yaratgan:</th>
+                        <td>{{ report.created_by|default:"—" }}</td>
+                    </tr>
+                    <tr>
+                        <th>Yaratilgan sana:</th>
+                        <td>{{ report.created_at|date:"d.m.Y H:i" }}</td>
+                    </tr>
+                    <tr>
+                        <th>Holat:</th>
+                        <td>
+                            {% if report.is_generated %}
+                            <span class="badge bg-success">Tayyor</span>
+                            {% else %}
+                            <span class="badge bg-warning">Kutilmoqda</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                </table>
+
+                {% if report.description %}
+                <hr>
+                <strong>Tavsif:</strong>
+                <p class="mb-0">{{ report.description|linebreaksbr }}</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-download"></i> Yuklab olish</h5>
+            </div>
+            <div class="card-body">
+                {% if report.file %}
+                <a href="{{ report.file.url }}" class="btn btn-success w-100">
+                    <i class="fas fa-download"></i> Faylni yuklab olish
+                </a>
+                {% else %}
+                <p class="text-muted small mb-3">Bu hisobot uchun fayl biriktirilmagan.</p>
+                <a href="{% url 'export-patients' %}" class="btn btn-outline-success w-100 mb-2">
+                    <i class="fas fa-file-csv"></i> Bemorlar CSV
+                </a>
+                <a href="{% url 'export-neuroprotein' %}" class="btn btn-outline-primary w-100">
+                    <i class="fas fa-file-csv"></i> Neyro-oqsillar CSV
+                </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,145 +1,128 @@
 {% extends 'base.html' %}
-{% load static %}
 
 {% block title %}Dashboard - NeuroMonitor{% endblock %}
 
 {% block content %}
-<div class="row">
-    <div class="col-12">
-        <h1 class="mb-4">
-            <i class="fas fa-tachometer-alt"></i> Dashboard
-        </h1>
+<h1 class="mb-4"><i class="fas fa-tachometer-alt"></i> Dashboard</h1>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-3">
+        <a href="{% url 'patient-list' %}?status=active" class="text-decoration-none">
+            <div class="card text-white bg-primary h-100">
+                <div class="card-body d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="card-title">Faol bemorlar</h6>
+                        <h2 class="mb-0">{{ active_patient_count }}</h2>
+                    </div>
+                    <i class="fas fa-user-injured fa-3x opacity-50"></i>
+                </div>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-3">
+        <a href="{% url 'labtest-list' %}" class="text-decoration-none">
+            <div class="card text-white bg-success h-100">
+                <div class="card-body d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="card-title">Bugungi tahlillar</h6>
+                        <h2 class="mb-0">{{ tests_today }}</h2>
+                    </div>
+                    <i class="fas fa-flask fa-3x opacity-50"></i>
+                </div>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-3">
+        <a href="{% url 'neuroprotein-list' %}?abnormal=1" class="text-decoration-none">
+            <div class="card text-white bg-warning h-100">
+                <div class="card-body d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="card-title">Chetlashgan natijalar</h6>
+                        <h2 class="mb-0">{{ abnormal_count }}</h2>
+                    </div>
+                    <i class="fas fa-exclamation-triangle fa-3x opacity-50"></i>
+                </div>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-3">
+        <a href="{% url 'monitoring-session-list' %}?status=active" class="text-decoration-none">
+            <div class="card text-white bg-info h-100">
+                <div class="card-body d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="card-title">Faol monitoring</h6>
+                        <h2 class="mb-0">{{ active_sessions }}</h2>
+                    </div>
+                    <i class="fas fa-heartbeat fa-3x opacity-50"></i>
+                </div>
+            </div>
+        </a>
     </div>
 </div>
 
-<!-- Statistics Cards -->
-<div class="row mb-4">
-    <div class="col-md-3">
-        <div class="card text-white bg-primary mb-3">
-            <div class="card-body">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <h5 class="card-title">Faol bemorlar</h5>
-                        <h2>{{ patients.count }}</h2>
-                    </div>
-                    <div>
-                        <i class="fas fa-user-injured fa-3x opacity-50"></i>
-                    </div>
-                </div>
-            </div>
-        </div>
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0"><i class="fas fa-list"></i> Faol bemorlar</h5>
+        <a href="{% url 'patient-create' %}" class="btn btn-primary btn-sm">
+            <i class="fas fa-plus"></i> Yangi bemor
+        </a>
     </div>
-    <div class="col-md-3">
-        <div class="card text-white bg-success mb-3">
-            <div class="card-body">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <h5 class="card-title">Bugungi tahlillar</h5>
-                        <h2>0</h2>
-                    </div>
-                    <div>
-                        <i class="fas fa-flask fa-3x opacity-50"></i>
-                    </div>
-                </div>
-            </div>
+    <div class="card-body">
+        {% if patients %}
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Karta №</th>
+                        <th>FIO</th>
+                        <th>Jinsi</th>
+                        <th>Tug'ilgan sana</th>
+                        <th>Gestatsion yoshi</th>
+                        <th>Yoshi (kun)</th>
+                        <th>Amallar</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for patient in patients %}
+                    <tr>
+                        <td>{{ patient.medical_record_number }}</td>
+                        <td>
+                            <a href="{% url 'patient-detail' patient.pk %}">{{ patient.full_name }}</a>
+                        </td>
+                        <td>{{ patient.get_gender_display }}</td>
+                        <td>{{ patient.birth_date|date:"d.m.Y H:i" }}</td>
+                        <td>
+                            {{ patient.gestational_age }} hafta
+                            {% if patient.is_preterm %}
+                            <span class="badge bg-warning text-dark">chala</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ patient.age_in_days }}</td>
+                        <td>
+                            <a href="{% url 'patient-detail' patient.pk %}" class="btn btn-sm btn-info" title="Ko'rish">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                            <a href="{% url 'patient-update' patient.pk %}" class="btn btn-sm btn-warning" title="Tahrirlash">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
-    </div>
-    <div class="col-md-3">
-        <div class="card text-white bg-warning mb-3">
-            <div class="card-body">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <h5 class="card-title">Ogohlantirishlar</h5>
-                        <h2>0</h2>
-                    </div>
-                    <div>
-                        <i class="fas fa-exclamation-triangle fa-3x opacity-50"></i>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-3">
-        <div class="card text-white bg-info mb-3">
-            <div class="card-body">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <h5 class="card-title">Monitoring sessiyalari</h5>
-                        <h2>0</h2>
-                    </div>
-                    <div>
-                        <i class="fas fa-heartbeat fa-3x opacity-50"></i>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
 
-<!-- Active Patients List -->
-<div class="row">
-    <div class="col-12">
-        <div class="card">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <h5 class="mb-0">
-                    <i class="fas fa-list"></i> Faol bemorlar
-                </h5>
-                <a href="{% url 'patient-create' %}" class="btn btn-primary btn-sm">
-                    <i class="fas fa-plus"></i> Yangi bemor
-                </a>
-            </div>
-            <div class="card-body">
-                {% if patients %}
-                <div class="table-responsive">
-                    <table class="table table-hover">
-                        <thead>
-                            <tr>
-                                <th>Karta №</th>
-                                <th>FIO</th>
-                                <th>Jinsi</th>
-                                <th>Tug'ilgan sana</th>
-                                <th>Gestatsion yoshi</th>
-                                <th>Yoshi (kun)</th>
-                                <th>Amallar</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for patient in patients %}
-                            <tr>
-                                <td>{{ patient.medical_record_number }}</td>
-                                <td>
-                                    <a href="{% url 'patient-detail' patient.pk %}">
-                                        {{ patient.first_name }} {{ patient.last_name }}
-                                    </a>
-                                </td>
-                                <td>{{ patient.get_gender_display }}</td>
-                                <td>{{ patient.birth_date|date:"d.m.Y H:i" }}</td>
-                                <td>{{ patient.gestational_age }} hafta</td>
-                                <td>{{ patient.age_in_days|default:"—" }}</td>
-                                <td>
-                                    <a href="{% url 'patient-detail' patient.pk %}" class="btn btn-sm btn-info">
-                                        <i class="fas fa-eye"></i>
-                                    </a>
-                                    <a href="{% url 'patient-update' patient.pk %}" class="btn btn-sm btn-warning">
-                                        <i class="fas fa-edit"></i>
-                                    </a>
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-                {% else %}
-                <div class="text-center text-muted py-5">
-                    <i class="fas fa-user-injured fa-4x mb-3"></i>
-                    <p>Hozircha faol bemorlar yo'q</p>
-                    <a href="{% url 'patient-create' %}" class="btn btn-primary">
-                        <i class="fas fa-plus"></i> Birinchi bemorni qo'shish
-                    </a>
-                </div>
-                {% endif %}
-            </div>
+        {% include 'includes/pagination.html' %}
+
+        {% else %}
+        <div class="text-center text-muted py-5">
+            <i class="fas fa-user-injured fa-4x mb-3"></i>
+            <p>Hozircha faol bemorlar yo'q</p>
+            <a href="{% url 'patient-create' %}" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Birinchi bemorni qo'shish
+            </a>
         </div>
+        {% endif %}
     </div>
 </div>
 {% endblock %}

@@ -21,7 +21,9 @@ class PatientAdmin(admin.ModelAdmin):
     ]
     list_filter = ['gender', 'is_active', 'admission_date']
     search_fields = ['medical_record_number', 'first_name', 'last_name', 'mother_name']
-    readonly_fields = ['created_at', 'updated_at', 'created_by']
+    # admission_date auto_now_add bo'lgani uchun tahrirlab bo'lmaydi —
+    # fieldsets'da ko'rsatilgani sababli readonly bo'lishi SHART, aks holda FieldError
+    readonly_fields = ['admission_date', 'created_at', 'updated_at', 'created_by']
     inlines = [MedicalHistoryInline]
 
     fieldsets = (

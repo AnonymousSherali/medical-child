@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Hayotiy ko'rsatkichlar - NeuroMonitor{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="mb-0"><i class="fas fa-wave-square"></i> Hayotiy ko'rsatkichlarni qayd qilish</h1>
+    <a href="{% url 'monitoring-session-detail' session.pk %}" class="btn btn-secondary">
+        <i class="fas fa-arrow-left"></i> Orqaga
+    </a>
+</div>
+
+<div class="row">
+    <div class="col-lg-8 offset-lg-2">
+        <div class="card mb-3">
+            <div class="card-body bg-light">
+                <strong>Bemor:</strong> {{ session.patient }}
+                &nbsp;|&nbsp;
+                <strong>Sessiya boshlangan:</strong> {{ session.start_date|date:"d.m.Y H:i" }}
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Ko'rsatkichlar</h5>
+            </div>
+            <div class="card-body">
+                <form method="post" novalidate>
+                    {% csrf_token %}
+                    {{ form|crispy }}
+                    <div class="d-flex justify-content-end gap-2 mt-3">
+                        <a href="{% url 'monitoring-session-detail' session.pk %}" class="btn btn-secondary">
+                            <i class="fas fa-times"></i> Bekor qilish
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Saqlash
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

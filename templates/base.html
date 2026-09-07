@@ -6,20 +6,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}NeuroMonitor{% endblock %}</title>
 
-    <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-
-    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-    <!-- Custom CSS -->
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
 
     {% block extra_css %}{% endblock %}
 </head>
-<body>
+<body class="d-flex flex-column min-vh-100">
 
-    <!-- Navigation -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
         <div class="container-fluid">
             <a class="navbar-brand" href="{% url 'dashboard' %}">
@@ -46,15 +40,26 @@
                             <i class="fas fa-heartbeat"></i> Monitoring
                         </a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'labtest-list' %}">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
                             <i class="fas fa-flask"></i> Laboratoriya
                         </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="{% url 'labtest-list' %}">Tahlillar</a></li>
+                            <li><a class="dropdown-item" href="{% url 'neuroprotein-list' %}">Neyro-oqsil natijalari</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="{% url 'labtest-create' %}">Yangi tahlil buyurtmasi</a></li>
+                        </ul>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'analytics-dashboard' %}">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
                             <i class="fas fa-chart-line"></i> Analitika
                         </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="{% url 'analytics-dashboard' %}">Umumiy ko'rsatkichlar</a></li>
+                            <li><a class="dropdown-item" href="{% url 'report-list' %}">Hisobotlar</a></li>
+                            <li><a class="dropdown-item" href="{% url 'statistics' %}">Kunlik statistika</a></li>
+                        </ul>
                     </li>
                     {% endif %}
                 </ul>
@@ -65,12 +70,22 @@
                             <i class="fas fa-user"></i> {{ user.get_full_name|default:user.username }}
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end">
-                            <li><a class="dropdown-item" href="#">Profil</a></li>
+                            <li>
+                                <span class="dropdown-item-text text-muted small">{{ user.get_role_display }}</span>
+                            </li>
                             {% if user.is_staff %}
                             <li><a class="dropdown-item" href="{% url 'admin:index' %}">Admin panel</a></li>
                             {% endif %}
                             <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item" href="{% url 'logout' %}">Chiqish</a></li>
+                            <li>
+                                {# Django 5 da logout faqat POST orqali ishlaydi #}
+                                <form method="post" action="{% url 'logout' %}" class="px-3 py-1">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-sm btn-outline-danger w-100">
+                                        <i class="fas fa-sign-out-alt"></i> Chiqish
+                                    </button>
+                                </form>
+                            </li>
                         </ul>
                     </li>
                     {% else %}
@@ -83,36 +98,28 @@
         </div>
     </nav>
 
-    <!-- Messages -->
     {% if messages %}
-    <div class="container mt-3">
+    <div class="container-fluid mt-3">
         {% for message in messages %}
-        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+        <div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show" role="alert">
             {{ message }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Yopish"></button>
         </div>
         {% endfor %}
     </div>
     {% endif %}
 
-    <!-- Main Content -->
-    <main class="container-fluid mt-4">
+    <main class="container-fluid mt-4 flex-grow-1">
         {% block content %}{% endblock %}
     </main>
 
-    <!-- Footer -->
-    <footer class="bg-light text-center text-lg-start mt-5">
-        <div class="text-center p-3">
-            © 2024 NeuroMonitor - Yangi tug'ilganlar neyrodiagnostika tizimi
+    <footer class="bg-light text-center mt-5">
+        <div class="p-3 text-muted">
+            &copy; {% now "Y" %} NeuroMonitor — Yangi tug'ilganlar neyrodiagnostika tizimi
         </div>
     </footer>
 
-    <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
-    <!-- jQuery -->
-    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
-
     {% block extra_js %}{% endblock %}
 </body>
 </html>
