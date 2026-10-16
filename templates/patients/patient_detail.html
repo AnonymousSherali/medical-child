@@ -1,260 +1,313 @@
 {% extends 'base.html' %}
 
-{% block title %}{{ patient.full_name }} - NeuroMonitor{% endblock %}
+{% block title %}{{ patient.full_name }}{% endblock %}
+{% block breadcrumbs %}
+<li class="breadcrumb-item"><a href="{% url 'patient-list' %}">Bemorlar</a></li>
+<li class="breadcrumb-item active">{{ patient.full_name }}</li>
+{% endblock %}
+
+{% block page_title %}
+<span class="d-flex align-items-center flex-wrap gap-2">
+    {{ patient.full_name }}
+    {% if patient.is_active %}
+    <span class="badge badge-soft-success fs-6"><i class="fa-solid fa-circle fa-2xs me-1"></i>Faol</span>
+    {% else %}
+    <span class="badge badge-soft-secondary fs-6">Chiqarilgan</span>
+    {% endif %}
+    {% if patient.is_preterm %}<span class="badge badge-soft-warning fs-6">Chala tug'ilgan</span>{% endif %}
+</span>
+{% endblock %}
+{% block page_subtitle %}Karta № {{ patient.medical_record_number }} · {{ patient.get_gender_display }} · {{ patient.age_in_days }} kunlik{% endblock %}
+
+{% block page_actions %}
+<button type="button" class="btn btn-soft" onclick="window.print()"><i class="fa-solid fa-print me-1"></i> Chop etish</button>
+<a href="{% url 'patient-update' patient.pk %}" class="btn btn-primary"><i class="fa-solid fa-pen me-1"></i> Tahrirlash</a>
+{% endblock %}
 
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
-    <h1 class="mb-0">
-        <i class="fas fa-user-injured"></i> {{ patient.full_name }}
-        {% if patient.is_active %}
-        <span class="badge bg-success">Faol</span>
-        {% else %}
-        <span class="badge bg-secondary">Chiqarilgan</span>
-        {% endif %}
-        {% if patient.is_preterm %}
-        <span class="badge bg-warning text-dark">Chala tug'ilgan</span>
-        {% endif %}
-    </h1>
-    <div class="d-flex gap-2">
-        <a href="{% url 'patient-update' patient.pk %}" class="btn btn-warning">
-            <i class="fas fa-edit"></i> Tahrirlash
+{# ---------- Tezkor amallar ---------- #}
+<div class="row g-3 mb-4 nm-no-print">
+    <div class="col-sm-6 col-xl-3">
+        {% if active_session %}
+        <a href="{% url 'monitoring-session-detail' active_session.pk %}" class="card nm-action">
+            <span class="nm-icon-chip nm-icon-chip-sm bg-success-subtle text-success-emphasis"><i class="fa-solid fa-heart-pulse"></i></span>
+            <span><span class="nm-action-title d-block">Faol monitoring</span><span class="nm-action-text">Sessiyaga o'tish</span></span>
         </a>
-        <a href="{% url 'patient-list' %}" class="btn btn-secondary">
-            <i class="fas fa-arrow-left"></i> Orqaga
+        {% else %}
+        <a href="{% url 'monitoring-session-create' %}?patient={{ patient.pk }}" class="card nm-action">
+            <span class="nm-icon-chip nm-icon-chip-sm bg-danger-subtle text-danger-emphasis"><i class="fa-solid fa-heart-pulse"></i></span>
+            <span><span class="nm-action-title d-block">Monitoring boshlash</span><span class="nm-action-text">Hayotiy ko'rsatkichlarni kuzatish</span></span>
+        </a>
+        {% endif %}
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <a href="{% url 'labtest-create' %}?patient={{ patient.pk }}" class="card nm-action">
+            <span class="nm-icon-chip nm-icon-chip-sm bg-primary-subtle text-primary-emphasis"><i class="fa-solid fa-flask-vial"></i></span>
+            <span><span class="nm-action-title d-block">Tahlil buyurtmasi</span><span class="nm-action-text">NSE, S100B, GFAP, qon</span></span>
+        </a>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <a href="{% url 'history-create' patient.pk %}" class="card nm-action">
+            <span class="nm-icon-chip nm-icon-chip-sm bg-warning-subtle text-warning-emphasis"><i class="fa-solid fa-notes-medical"></i></span>
+            <span><span class="nm-action-title d-block">Tarixga yozuv</span><span class="nm-action-text">Kuzatuv, ko'rik xulosasi</span></span>
+        </a>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <a href="{% url 'patient-update' patient.pk %}" class="card nm-action">
+            <span class="nm-icon-chip nm-icon-chip-sm bg-secondary-subtle text-secondary-emphasis"><i class="fa-solid fa-hospital-user"></i></span>
+            <span><span class="nm-action-title d-block">Holatni yangilash</span><span class="nm-action-text">Tashxis, chiqarish</span></span>
         </a>
     </div>
 </div>
 
-<div class="row">
-    <div class="col-lg-6">
+<div class="row g-4">
+    {# ---------- Chap ustun: asosiy ma'lumotlar ---------- #}
+    <div class="col-xl-4">
         <div class="card mb-4">
-            <div class="card-header bg-primary text-white">
-                <h5 class="mb-0">Asosiy ma'lumotlar</h5>
+            <div class="card-header"><h2 class="card-title-sm"><i class="fa-solid fa-id-card"></i> Asosiy ma'lumotlar</h2></div>
+            <div class="card-body">
+                <dl class="nm-info-list">
+                    <dt>Tug'ilgan</dt><dd>{{ patient.birth_date|date:"d.m.Y H:i" }}</dd>
+                    <dt>Qabul qilingan</dt><dd>{{ patient.admission_date|date:"d.m.Y H:i" }}</dd>
+                    {% if patient.discharge_date %}<dt>Chiqarilgan</dt><dd>{{ patient.discharge_date|date:"d.m.Y H:i" }}</dd>{% endif %}
+                    <dt>Ro'yxatga olgan</dt><dd>{{ patient.created_by|default:"—" }}</dd>
+                </dl>
+            </div>
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-header"><h2 class="card-title-sm"><i class="fa-solid fa-ruler-combined"></i> Tug'ilish parametrlari</h2></div>
+            <div class="card-body">
+                <div class="row g-2">
+                    <div class="col-6"><div class="nm-metric">
+                        <div class="nm-metric-value">{{ patient.gestational_age }}</div>
+                        <div class="nm-metric-label">Gestatsion yosh, hafta
+                            {% include 'includes/help_tip.html' with text="Homiladorlik muddati. 37 haftadan kam — chala tug'ilgan." %}</div>
+                    </div></div>
+                    <div class="col-6"><div class="nm-metric">
+                        <div class="nm-metric-value">{{ patient.birth_weight|num }}</div>
+                        <div class="nm-metric-label">Og'irlik, kg</div>
+                    </div></div>
+                    <div class="col-6"><div class="nm-metric">
+                        <div class="nm-metric-value">{{ patient.birth_length|num }}</div>
+                        <div class="nm-metric-label">Bo'y, sm</div>
+                    </div></div>
+                    <div class="col-6"><div class="nm-metric">
+                        <div class="nm-metric-value">{{ patient.head_circumference|num }}</div>
+                        <div class="nm-metric-label">Bosh aylanasi, sm</div>
+                    </div></div>
+                    <div class="col-12"><div class="nm-metric d-flex align-items-center justify-content-between">
+                        <div>
+                            <div class="nm-metric-value">{{ patient.apgar_score_1min }} / {{ patient.apgar_score_5min }}</div>
+                            <div class="nm-metric-label">Apgar (1 / 5 daqiqa)
+                                {% include 'includes/help_tip.html' with text="Tug'ilgandan keyin 1 va 5-daqiqada 5 mezon bo'yicha baho: yurak urishi, nafas, mushak tonusi, reflekslar, teri rangi. 0–10 ball." %}</div>
+                        </div>
+                        <i class="fa-solid fa-stethoscope fa-lg text-body-tertiary"></i>
+                    </div></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-header"><h2 class="card-title-sm"><i class="fa-solid fa-person-breastfeeding"></i> Ona ma'lumotlari</h2></div>
+            <div class="card-body">
+                <dl class="nm-info-list">
+                    <dt>FIO</dt><dd>{{ patient.mother_name }}</dd>
+                    <dt>Yoshi</dt><dd>{{ patient.mother_age }} yosh</dd>
+                    <dt>Telefon</dt><dd><a href="tel:{{ patient.mother_phone }}" class="text-decoration-none">{{ patient.mother_phone }}</a></dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+
+    {# ---------- O'ng ustun: klinik ma'lumotlar ---------- #}
+    <div class="col-xl-8">
+        <div class="card mb-4">
+            <div class="card-header"><h2 class="card-title-sm"><i class="fa-solid fa-file-medical"></i> Klinik xulosa</h2></div>
+            <div class="card-body">
+                <div class="row g-4">
+                    <div class="col-md-4">
+                        <div class="small text-body-secondary fw-semibold mb-1">Tashxis</div>
+                        <div>{{ patient.diagnosis|default:"Kiritilmagan"|linebreaksbr }}</div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="small text-body-secondary fw-semibold mb-1">Asoratlar</div>
+                        <div>{{ patient.complications|default:"Kiritilmagan"|linebreaksbr }}</div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="small text-body-secondary fw-semibold mb-1">Davolash rejasi</div>
+                        <div>{{ patient.treatment_plan|default:"Kiritilmagan"|linebreaksbr }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-header">
+                <h2 class="card-title-sm"><i class="fa-solid fa-chart-line"></i> Neyro-oqsillar dinamikasi
+                    {% include 'includes/help_tip.html' with text="NSE, S100B va GFAP — miya to'qimasi shikastlanganda qonda oshadigan oqsillar. Qizil nuqta — me'yordan chetlashgan natija." %}
+                </h2>
             </div>
             <div class="card-body">
-                <table class="table table-borderless mb-0">
-                    <tr><th width="40%">Karta raqami:</th><td>{{ patient.medical_record_number }}</td></tr>
-                    <tr><th>Jinsi:</th><td>{{ patient.get_gender_display }}</td></tr>
-                    <tr><th>Tug'ilgan sana:</th><td>{{ patient.birth_date|date:"d.m.Y H:i" }}</td></tr>
-                    <tr><th>Yoshi:</th><td>{{ patient.age_in_days }} kun</td></tr>
-                    <tr><th>Qabul qilingan:</th><td>{{ patient.admission_date|date:"d.m.Y H:i" }}</td></tr>
-                    {% if patient.discharge_date %}
-                    <tr><th>Chiqarilgan:</th><td>{{ patient.discharge_date|date:"d.m.Y H:i" }}</td></tr>
+                {% if protein_chart %}
+                <div class="row g-3">
+                    {% for s in protein_chart %}
+                    <div class="{% if protein_chart|length == 1 %}col-12{% elif protein_chart|length == 2 %}col-md-6{% else %}col-md-6 col-xxl-4{% endif %}">
+                        <div class="nm-metric">
+                            <div class="d-flex justify-content-between align-items-start mb-1">
+                                <span class="fw-semibold">{{ s.label }}</span>
+                                {% if s.latest_abnormal %}<span class="badge badge-soft-danger">chetlashgan</span>{% endif %}
+                            </div>
+                            <div class="nm-metric-value {% if s.latest_abnormal %}text-danger{% endif %}">
+                                {{ s.latest|floatformat:"-2" }} <span class="fs-6 fw-normal text-body-secondary">{{ s.unit }}</span>
+                            </div>
+                            <div class="nm-metric-label mb-2">
+                                oxirgi natija{% if s.ref_min is not None or s.ref_max is not None %} · me'yor {{ s.ref_min|default_if_none:"…" }}–{{ s.ref_max|default_if_none:"…" }}{% endif %}
+                            </div>
+                            <div class="nm-chart nm-chart-xs"><canvas id="proteinChart{{ forloop.counter0 }}" aria-label="{{ s.label }} dinamikasi"></canvas></div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                {% include 'includes/empty_state.html' with icon='fa-atom' title="Hali natijalar yo'q" text="Neyro-oqsil tahlili natijalari kiritilgach, o'zgarish grafigi shu yerda ko'rinadi." %}
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="row g-4 mb-4">
+            <div class="col-lg-6">
+                <div class="card h-100">
+                    <div class="card-header">
+                        <h2 class="card-title-sm"><i class="fa-solid fa-flask-vial"></i> Tahlillar</h2>
+                        <a href="{% url 'labtest-create' %}?patient={{ patient.pk }}" class="btn btn-sm btn-soft nm-no-print"><i class="fa-solid fa-plus"></i></a>
+                    </div>
+                    {% if lab_tests %}
+                    <div>
+                        {% for test in lab_tests %}
+                        <a href="{% url 'labtest-detail' test.pk %}" class="nm-list-item">
+                            <span class="flex-grow-1">
+                                <span class="d-block fw-semibold">{{ test.get_test_type_display }}</span>
+                                <span class="d-block small text-body-secondary">{{ test.test_date|date:"d.m.Y H:i" }}</span>
+                            </span>
+                            {% if test.has_abnormal_results %}
+                            <span class="badge badge-soft-danger">Chetlashgan</span>
+                            {% elif test.is_completed %}
+                            <span class="badge badge-soft-success">Tugallangan</span>
+                            {% else %}
+                            <span class="badge badge-soft-warning">Jarayonda</span>
+                            {% endif %}
+                        </a>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="card-body">{% include 'includes/empty_state.html' with icon='fa-flask-vial' title="Tahlillar yo'q" %}</div>
                     {% endif %}
-                </table>
-            </div>
-        </div>
-
-        <div class="card mb-4">
-            <div class="card-header bg-info text-white">
-                <h5 class="mb-0">Tug'ilish parametrlari</h5>
-            </div>
-            <div class="card-body">
-                <table class="table table-borderless mb-0">
-                    <tr><th width="40%">Gestatsion yoshi:</th><td>{{ patient.gestational_age }} hafta</td></tr>
-                    <tr><th>Og'irligi:</th><td>{{ patient.birth_weight }} kg</td></tr>
-                    <tr><th>Bo'yi:</th><td>{{ patient.birth_length }} sm</td></tr>
-                    <tr><th>Bosh aylanasi:</th><td>{{ patient.head_circumference }} sm</td></tr>
-                    <tr><th>Apgar (1/5 daq):</th><td>{{ patient.apgar_score_1min }} / {{ patient.apgar_score_5min }}</td></tr>
-                </table>
-            </div>
-        </div>
-    </div>
-
-    <div class="col-lg-6">
-        <div class="card mb-4">
-            <div class="card-header bg-warning text-dark">
-                <h5 class="mb-0">Ona ma'lumotlari</h5>
-            </div>
-            <div class="card-body">
-                <table class="table table-borderless mb-0">
-                    <tr><th width="40%">FIO:</th><td>{{ patient.mother_name }}</td></tr>
-                    <tr><th>Yoshi:</th><td>{{ patient.mother_age }} yosh</td></tr>
-                    <tr><th>Telefon:</th><td>{{ patient.mother_phone }}</td></tr>
-                </table>
-            </div>
-        </div>
-
-        <div class="card mb-4">
-            <div class="card-header bg-danger text-white">
-                <h5 class="mb-0">Tibbiy ma'lumotlar</h5>
-            </div>
-            <div class="card-body">
-                <div class="mb-3">
-                    <strong>Tashxis:</strong>
-                    <p class="mb-0">{{ patient.diagnosis|default:"—"|linebreaksbr }}</p>
                 </div>
-                <div class="mb-3">
-                    <strong>Asoratlar:</strong>
-                    <p class="mb-0">{{ patient.complications|default:"—"|linebreaksbr }}</p>
-                </div>
-                <div>
-                    <strong>Davolash rejasi:</strong>
-                    <p class="mb-0">{{ patient.treatment_plan|default:"—"|linebreaksbr }}</p>
+            </div>
+            <div class="col-lg-6">
+                <div class="card h-100">
+                    <div class="card-header">
+                        <h2 class="card-title-sm"><i class="fa-solid fa-heart-pulse"></i> Monitoring sessiyalari</h2>
+                        {% if not active_session %}
+                        <a href="{% url 'monitoring-session-create' %}?patient={{ patient.pk }}" class="btn btn-sm btn-soft nm-no-print"><i class="fa-solid fa-plus"></i></a>
+                        {% endif %}
+                    </div>
+                    {% if sessions %}
+                    <div>
+                        {% for session in sessions %}
+                        <a href="{% url 'monitoring-session-detail' session.pk %}" class="nm-list-item">
+                            <span class="flex-grow-1">
+                                <span class="d-block fw-semibold">{{ session.start_date|date:"d.m.Y H:i" }}</span>
+                                <span class="d-block small text-body-secondary">
+                                    {% if session.end_date %}Yakunlangan: {{ session.end_date|date:"d.m.Y H:i" }}{% else %}Davom etmoqda{% endif %}
+                                </span>
+                            </span>
+                            {% if session.is_active %}
+                            <span class="badge badge-soft-success">Faol</span>
+                            {% else %}
+                            <span class="badge badge-soft-secondary">Yakunlangan</span>
+                            {% endif %}
+                        </a>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="card-body">{% include 'includes/empty_state.html' with icon='fa-heart-pulse' title="Sessiyalar yo'q" %}</div>
+                    {% endif %}
                 </div>
             </div>
         </div>
-    </div>
-</div>
 
-<div class="card mb-4">
-    <div class="card-header">
-        <h5 class="mb-0">Tezkor amallar</h5>
-    </div>
-    <div class="card-body">
-        <div class="row g-3">
-            <div class="col-md-3">
-                {% if active_session %}
-                <a href="{% url 'monitoring-session-detail' active_session.pk %}" class="btn btn-outline-success w-100 h-100">
-                    <i class="fas fa-heartbeat fa-2x d-block mb-2"></i>
-                    Faol monitoringga o'tish
-                </a>
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title-sm"><i class="fa-solid fa-clock-rotate-left"></i> Tibbiy tarix</h2>
+                <a href="{% url 'history-create' patient.pk %}" class="btn btn-sm btn-soft nm-no-print"><i class="fa-solid fa-plus me-1"></i>Yozuv</a>
+            </div>
+            <div class="card-body">
+                {% if histories %}
+                <ul class="nm-timeline">
+                    {% for history in histories %}
+                    <li>
+                        <div class="d-flex flex-wrap justify-content-between gap-2 mb-1">
+                            <strong>{{ history.date|date:"d.m.Y H:i" }}</strong>
+                            <span class="small text-body-secondary"><i class="fa-solid fa-user-doctor me-1"></i>{{ history.doctor|default:"—" }}</span>
+                        </div>
+                        <div class="text-body">{{ history.description|linebreaksbr }}</div>
+                    </li>
+                    {% endfor %}
+                </ul>
                 {% else %}
-                <a href="{% url 'monitoring-session-create' %}?patient={{ patient.pk }}" class="btn btn-outline-primary w-100 h-100">
-                    <i class="fas fa-heartbeat fa-2x d-block mb-2"></i>
-                    Monitoring boshlash
-                </a>
-                {% endif %}
-            </div>
-            <div class="col-md-3">
-                <a href="{% url 'labtest-create' %}?patient={{ patient.pk }}" class="btn btn-outline-success w-100 h-100">
-                    <i class="fas fa-flask fa-2x d-block mb-2"></i>
-                    Tahlil buyurtmasi
-                </a>
-            </div>
-            <div class="col-md-3">
-                <a href="{% url 'analytics-dashboard' %}" class="btn btn-outline-info w-100 h-100">
-                    <i class="fas fa-chart-line fa-2x d-block mb-2"></i>
-                    Analitika
-                </a>
-            </div>
-            <div class="col-md-3">
-                <a href="{% url 'history-create' patient.pk %}" class="btn btn-outline-warning w-100 h-100">
-                    <i class="fas fa-notes-medical fa-2x d-block mb-2"></i>
-                    Tarix qo'shish
-                </a>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="row">
-    <div class="col-lg-6">
-        <div class="card mb-4">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <h5 class="mb-0"><i class="fas fa-flask"></i> Laboratoriya tahlillari</h5>
-                <a href="{% url 'labtest-create' %}?patient={{ patient.pk }}" class="btn btn-sm btn-outline-primary">
-                    <i class="fas fa-plus"></i>
-                </a>
-            </div>
-            <div class="card-body">
-                {% if lab_tests %}
-                <div class="table-responsive">
-                    <table class="table table-sm table-hover mb-0">
-                        <thead>
-                            <tr><th>Turi</th><th>Sana</th><th>Holat</th><th></th></tr>
-                        </thead>
-                        <tbody>
-                            {% for test in lab_tests %}
-                            <tr>
-                                <td>{{ test.get_test_type_display }}</td>
-                                <td>{{ test.test_date|date:"d.m.Y" }}</td>
-                                <td>
-                                    {% if test.has_abnormal_results %}
-                                    <span class="badge bg-danger">Chetlashgan</span>
-                                    {% elif test.is_completed %}
-                                    <span class="badge bg-success">Tugallangan</span>
-                                    {% else %}
-                                    <span class="badge bg-warning">Jarayonda</span>
-                                    {% endif %}
-                                </td>
-                                <td>
-                                    <a href="{% url 'labtest-detail' test.pk %}" class="btn btn-sm btn-info">
-                                        <i class="fas fa-eye"></i>
-                                    </a>
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-                {% else %}
-                <p class="text-muted text-center mb-0 py-3">Tahlillar yo'q</p>
-                {% endif %}
-            </div>
-        </div>
-    </div>
-
-    <div class="col-lg-6">
-        <div class="card mb-4">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <h5 class="mb-0"><i class="fas fa-heartbeat"></i> Monitoring sessiyalari</h5>
-                {% if not active_session %}
-                <a href="{% url 'monitoring-session-create' %}?patient={{ patient.pk }}" class="btn btn-sm btn-outline-primary">
-                    <i class="fas fa-plus"></i>
-                </a>
-                {% endif %}
-            </div>
-            <div class="card-body">
-                {% if sessions %}
-                <div class="table-responsive">
-                    <table class="table table-sm table-hover mb-0">
-                        <thead>
-                            <tr><th>Boshlangan</th><th>Yakunlangan</th><th>Holat</th><th></th></tr>
-                        </thead>
-                        <tbody>
-                            {% for session in sessions %}
-                            <tr>
-                                <td>{{ session.start_date|date:"d.m.Y H:i" }}</td>
-                                <td>{{ session.end_date|date:"d.m.Y H:i"|default:"—" }}</td>
-                                <td>
-                                    {% if session.is_active %}
-                                    <span class="badge bg-success">Faol</span>
-                                    {% else %}
-                                    <span class="badge bg-secondary">Yakunlangan</span>
-                                    {% endif %}
-                                </td>
-                                <td>
-                                    <a href="{% url 'monitoring-session-detail' session.pk %}" class="btn btn-sm btn-info">
-                                        <i class="fas fa-eye"></i>
-                                    </a>
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-                {% else %}
-                <p class="text-muted text-center mb-0 py-3">Monitoring sessiyalari yo'q</p>
+                {% include 'includes/empty_state.html' with icon='fa-clock-rotate-left' title="Yozuvlar yo'q" text="Kuzatuvlar va ko'rik xulosalari shu yerda vaqt tartibida ko'rinadi." %}
                 {% endif %}
             </div>
         </div>
     </div>
 </div>
 
-<div class="card">
-    <div class="card-header d-flex justify-content-between align-items-center">
-        <h5 class="mb-0"><i class="fas fa-notes-medical"></i> Tibbiy tarix</h5>
-        <a href="{% url 'history-create' patient.pk %}" class="btn btn-sm btn-outline-warning">
-            <i class="fas fa-plus"></i> Yozuv qo'shish
-        </a>
-    </div>
-    <div class="card-body">
-        {% if histories %}
-        <div class="list-group list-group-flush">
-            {% for history in histories %}
-            <div class="list-group-item">
-                <div class="d-flex justify-content-between align-items-center mb-1">
-                    <strong>{{ history.date|date:"d.m.Y H:i" }}</strong>
-                    <small class="text-muted">{{ history.doctor|default:"—" }}</small>
-                </div>
-                <p class="mb-0">{{ history.description|linebreaksbr }}</p>
-            </div>
-            {% endfor %}
-        </div>
-        {% else %}
-        <p class="text-muted text-center mb-0 py-3">Tibbiy tarix yozuvlari yo'q</p>
-        {% endif %}
-    </div>
-</div>
+{{ protein_chart|json_script:"protein-data" }}
+{% endblock %}
+
+{% block extra_js %}
+{% include 'includes/chartjs.html' %}
+<script>
+    (NM.readJSON('protein-data') || []).forEach(function (s, i) {
+        NM.chart(function (c, options) {
+            var canvas = document.getElementById('proteinChart' + i);
+            if (!canvas) { return null; }
+            var color = [c.primary, c.teal, c.violet][i % 3];
+            var labels = s.points.map(function (p) { return p.x; });
+            var datasets = [{
+                label: s.label + ', ' + s.unit,
+                data: s.points.map(function (p) { return p.y; }),
+                borderColor: color,
+                backgroundColor: color,
+                tension: 0.3,
+                pointRadius: 5,
+                pointHoverRadius: 7,
+                pointBackgroundColor: s.points.map(function (p) { return p.abnormal ? c.danger : color; }),
+                pointBorderColor: s.points.map(function (p) { return p.abnormal ? c.danger : color; })
+            }];
+            // Me'yor chegaralari — uzuq qizil chiziq; o'q ularni ham qamrab olishi kerak
+            var values = s.points.map(function (p) { return p.y; });
+            var refs = [];
+            if (s.ref_max !== null) { refs.push({ value: s.ref_max, label: "me'yor ↑", color: c.danger }); values.push(s.ref_max); }
+            if (s.ref_min !== null) { refs.push({ value: s.ref_min, label: "me'yor ↓", color: c.warning }); values.push(s.ref_min); }
+            var hi = Math.max.apply(null, values), lo = Math.min.apply(null, values);
+            options.scales.y.suggestedMax = hi + (hi - lo || hi || 1) * 0.15;
+            options.scales.y.suggestedMin = Math.min(0, lo);
+            options.plugins.nmRefLines = { lines: refs };
+            options.plugins.legend.display = false;
+            options.plugins.tooltip.callbacks = {
+                label: function (ctx) {
+                    var p = s.points[ctx.dataIndex];
+                    return ' ' + ctx.formattedValue + ' ' + s.unit + (p.abnormal ? '  — chetlashgan' : '');
+                }
+            };
+            options.scales.x.ticks.maxRotation = 0;
+            options.scales.x.ticks.autoSkip = true;
+            options.scales.x.ticks.maxTicksLimit = 4;
+            return new Chart(canvas, { type: 'line', data: { labels: labels, datasets: datasets }, options: options });
+        });
+    });
+</script>
 {% endblock %}

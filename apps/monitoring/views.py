@@ -49,6 +49,19 @@ class MonitoringSessionDetailView(LoginRequiredMixin, DetailView):
         context['vital_signs'] = self.object.vital_signs.select_related('recorded_by')[:50]
         context['assessments'] = self.object.neurological_assessments.select_related('assessed_by')[:20]
         context['latest_vitals'] = self.object.vital_signs.first()
+
+        # Grafik: oxirgi 50 ta o'lchov, vaqt bo'yicha o'sish tartibida
+        recent = list(self.object.vital_signs.order_by('-timestamp')[:50])[::-1]
+        context['vitals_chart'] = {
+            'labels': [timezone.localtime(v.timestamp).strftime('%d.%m %H:%M') for v in recent],
+            'heart_rate': [v.heart_rate for v in recent],
+            'respiratory_rate': [v.respiratory_rate for v in recent],
+            'temperature': [float(v.temperature) for v in recent],
+            'oxygen_saturation': [
+                float(v.oxygen_saturation) if v.oxygen_saturation is not None else None
+                for v in recent
+            ],
+        }
         return context
 
 

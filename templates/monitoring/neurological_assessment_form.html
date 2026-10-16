@@ -1,49 +1,51 @@
-{% extends 'base.html' %}
+{% extends 'layouts/form_page.html' %}
 {% load crispy_forms_tags %}
 
-{% block title %}Nevrologik baholash - NeuroMonitor{% endblock %}
+{% block title %}Nevrologik baholash{% endblock %}
+{% block breadcrumbs %}
+<li class="breadcrumb-item"><a href="{% url 'monitoring-session-list' %}">Monitoring</a></li>
+<li class="breadcrumb-item"><a href="{% url 'monitoring-session-detail' session.pk %}">{{ session.patient.full_name }}</a></li>
+<li class="breadcrumb-item active">Nevrologik baholash</li>
+{% endblock %}
+{% block page_title %}Nevrologik baholash{% endblock %}
+{% block page_subtitle %}Ong darajasi, mushak tonusi, reflekslar va tutqanoq faolligi{% endblock %}
 
-{% block content %}
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h1 class="mb-0"><i class="fas fa-brain"></i> Nevrologik baholash</h1>
-    <a href="{% url 'monitoring-session-detail' session.pk %}" class="btn btn-secondary">
-        <i class="fas fa-arrow-left"></i> Orqaga
-    </a>
+{% block form_context %}
+<div class="nm-context-bar">
+    <div><span>Bemor:</span> <strong>{{ session.patient.full_name }}</strong></div>
+    <div><span>Gestatsion yosh:</span> <strong>{{ session.patient.gestational_age }} hafta</strong></div>
+    <div><span>Yoshi:</span> <strong>{{ session.patient.age_in_days }} kun</strong></div>
 </div>
+{% endblock %}
 
+{% block form_fields %}
 <div class="row">
-    <div class="col-lg-8 offset-lg-2">
-        <div class="card mb-3">
-            <div class="card-body bg-light">
-                <strong>Bemor:</strong> {{ session.patient }}
-                &nbsp;|&nbsp;
-                <strong>Sessiya boshlangan:</strong> {{ session.start_date|date:"d.m.Y H:i" }}
-            </div>
-        </div>
-
-        <div class="card">
-            <div class="card-header bg-warning text-dark">
-                <h5 class="mb-0">Baholash ma'lumotlari</h5>
-            </div>
-            <div class="card-body">
-                <div class="alert alert-info">
-                    <i class="fas fa-info-circle"></i>
-                    Tutqanoq faolligini belgilagan bo'lsangiz, uning tavsifini ham kiriting.
-                </div>
-                <form method="post" novalidate>
-                    {% csrf_token %}
-                    {{ form|crispy }}
-                    <div class="d-flex justify-content-end gap-2 mt-3">
-                        <a href="{% url 'monitoring-session-detail' session.pk %}" class="btn btn-secondary">
-                            <i class="fas fa-times"></i> Bekor qilish
-                        </a>
-                        <button type="submit" class="btn btn-warning">
-                            <i class="fas fa-save"></i> Saqlash
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
+    <div class="col-md-6">{{ form.consciousness_level|as_crispy_field }}</div>
+    <div class="col-md-6">{{ form.muscle_tone|as_crispy_field }}</div>
+    <div class="col-12">{{ form.reflexes|as_crispy_field }}</div>
+    <div class="col-md-6">{{ form.fontanelle_status|as_crispy_field }}</div>
+    <div class="col-md-6">{{ form.pupil_response|as_crispy_field }}</div>
 </div>
+<div class="p-3 rounded-3 border mb-3">
+    {{ form.seizure_activity|as_crispy_field }}
+    <div id="seizureDetails">{{ form.seizure_description|as_crispy_field }}</div>
+</div>
+{{ form.assessment_notes|as_crispy_field }}
+{% endblock %}
+
+{% block cancel_url %}{% url 'monitoring-session-detail' session.pk %}{% endblock %}
+{% block submit_label %}Baholashni saqlash{% endblock %}
+
+{% block extra_js %}
+<script>
+    /* Tutqanoq tavsifi faqat tutqanoq belgilanganda kerak */
+    (function () {
+        var box = document.getElementById('{{ form.seizure_activity.id_for_label }}');
+        var details = document.getElementById('seizureDetails');
+        if (!box || !details) { return; }
+        function sync() { details.hidden = !box.checked; }
+        box.addEventListener('change', sync);
+        sync();
+    })();
+</script>
 {% endblock %}

@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+
+{% block title %}Yordam{% endblock %}
+{% block breadcrumbs %}<li class="breadcrumb-item active">Yordam</li>{% endblock %}
+{% block page_title %}Yordam va atamalar{% endblock %}
+{% block page_subtitle %}Tizimdan foydalanish bo'yicha qisqa qo'llanma va tibbiy atamalar izohi{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+    <div class="col-lg-7">
+        <div class="card mb-4">
+            <div class="card-header"><h2 class="card-title-sm"><i class="fa-solid fa-route"></i> Ish tartibi: 4 qadam</h2></div>
+            <div class="card-body">
+                <ul class="nm-timeline">
+                    <li>
+                        <strong>1. Bemorni ro'yxatga oling</strong>
+                        <p class="text-body-secondary small mb-1">Yuqoridagi <span class="badge badge-soft-primary">+ Yangi → Bemor</span> tugmasi. Tug'ilish parametrlari va Apgar balini kiriting. 37 haftadan kam gestatsion yoshdagi bemor avtomatik "chala tug'ilgan" deb belgilanadi.</p>
+                        <a href="{% url 'patient-create' %}" class="small text-decoration-none">Bemor qo'shish →</a>
+                    </li>
+                    <li>
+                        <strong>2. Tahlil buyurtma qiling</strong>
+                        <p class="text-body-secondary small mb-1">Bemor sahifasidagi <em>Tahlil buyurtmasi</em>. Natija tayyor bo'lgach, tahlil sahifasida <em>Neyro-oqsil</em> yoki <em>Qon tahlili</em> natijasini kiriting. Me'yoriy diapazonni ham kiritsangiz, chetlashish avtomatik aniqlanadi.</p>
+                        <a href="{% url 'labtest-create' %}" class="small text-decoration-none">Tahlil buyurtma qilish →</a>
+                    </li>
+                    <li>
+                        <strong>3. Monitoringni boshlang</strong>
+                        <p class="text-body-secondary small mb-1">Sessiya ochib, hayotiy ko'rsatkichlar va nevrologik baholashni qayd qilib boring. Ko'rsatkichlar grafikda ko'rinadi. Kuzatuv tugagach sessiyani <em>Yakunlash</em> tugmasi bilan yoping.</p>
+                        <a href="{% url 'monitoring-session-create' %}" class="small text-decoration-none">Monitoring boshlash →</a>
+                    </li>
+                    <li>
+                        <strong>4. Natijalarni tahlil qiling</strong>
+                        <p class="text-body-secondary small mb-1">Bosh sahifadagi <em>E'tibor talab qiladi</em> bo'limi me'yordan chetlashgan natijalarni ko'rsatadi. <em>Analitika</em> bo'limida umumiy statistika va Excel uchun eksport mavjud.</p>
+                        <a href="{% url 'analytics-dashboard' %}" class="small text-decoration-none">Analitikaga o'tish →</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header"><h2 class="card-title-sm"><i class="fa-solid fa-circle-question"></i> Ko'p so'raladigan savollar</h2></div>
+            <div class="card-body p-0">
+                <div class="accordion accordion-flush" id="faq">
+                    <div class="accordion-item">
+                        <h3 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#q1">Nima uchun natija "Baholanmagan" deb ko'rsatilyapti?</button></h3>
+                        <div id="q1" class="accordion-collapse collapse" data-bs-parent="#faq"><div class="accordion-body small text-body-secondary">Natija kiritilganda me'yoriy diapazon (min / max) berilmagan. Me'yorlar tahlil usuli va gestatsion yoshga bog'liq, shuning uchun tizim ularni o'zi taxmin qilmaydi — laboratoriya hisobotidagi qiymatni kiriting.</div></div>
+                    </div>
+                    <div class="accordion-item">
+                        <h3 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#q2">Bemorni qanday chiqaraman?</button></h3>
+                        <div id="q2" class="accordion-collapse collapse" data-bs-parent="#faq"><div class="accordion-body small text-body-secondary">Bemor sahifasida <em>Tahrirlash</em> → "Bemor holati" bo'limida "Davolanishda" belgisini o'chiring va chiqarilgan sanani kiriting.</div></div>
+                    </div>
+                    <div class="accordion-item">
+                        <h3 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#q3">Yangi xodimni qanday qo'shaman?</button></h3>
+                        <div id="q3" class="accordion-collapse collapse" data-bs-parent="#faq"><div class="accordion-body small text-body-secondary">Hisoblarni faqat administrator yaratadi (yon menyudagi <em>Xodim qo'shish</em>). Xavfsizlik sababli o'z-o'zini ro'yxatdan o'tkazish o'chirilgan.</div></div>
+                    </div>
+                    <div class="accordion-item">
+                        <h3 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#q4">Ma'lumotlarni Excel'ga qanday chiqaraman?</button></h3>
+                        <div id="q4" class="accordion-collapse collapse" data-bs-parent="#faq"><div class="accordion-body small text-body-secondary"><em>Analitika → Eksport</em> yoki Bemorlar ro'yxatidagi <em>Excel (CSV)</em> tugmasi. Fayl Excel'da o'zbek harflari bilan to'g'ri ochiladi.</div></div>
+                    </div>
+                    <div class="accordion-item">
+                        <h3 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#q5">Qorong'i rejimni qanday yoqaman?</button></h3>
+                        <div id="q5" class="accordion-collapse collapse" data-bs-parent="#faq"><div class="accordion-body small text-body-secondary">Yuqori paneldagi <i class="fa-solid fa-moon"></i> tugmasi. Tanlov brauzeringizda eslab qolinadi.</div></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-5">
+        <div class="card mb-4">
+            <div class="card-header"><h2 class="card-title-sm"><i class="fa-solid fa-book-medical"></i> Atamalar lug'ati</h2></div>
+            <div class="card-body">
+                <dl class="mb-0">
+                    <dt>NSE — neyron-spetsifik enolaza</dt>
+                    <dd class="small text-body-secondary mb-3">Neyronlar sitoplazmasida joylashgan ferment. Neyronlar shikastlanganda qon va orqa miya suyuqligiga chiqadi, shuning uchun neyronal shikastlanish markeri sifatida o'rganiladi.</dd>
+                    <dt>S100B oqsili</dt>
+                    <dd class="small text-body-secondary mb-3">Asosan astrositlarda (glial hujayralarda) bo'ladigan kalsiy bog'lovchi oqsil. Gematoensefalik to'siq va glial to'qima shikastlanishi markeri.</dd>
+                    <dt>GFAP — gliofibrillyar kislotali oqsil</dt>
+                    <dd class="small text-body-secondary mb-3">Astrositlar tuzilmasining oqsili. Qonda oshishi astroglial shikastlanishni ko'rsatishi mumkin.</dd>
+                    <dt>Gestatsion yosh</dt>
+                    <dd class="small text-body-secondary mb-3">Homiladorlik muddati haftalarda. JSST tasnifi: &lt; 28 — o'ta erta, 28–31 — juda erta, 32–36 — o'rtacha/kech chala, ≥ 37 — muddatida tug'ilgan.</dd>
+                    <dt>Apgar shkalasi</dt>
+                    <dd class="small text-body-secondary mb-3">Tug'ilgandan keyin 1 va 5-daqiqada 5 mezon (yurak urishi, nafas, mushak tonusi, reflekslar, teri rangi) bo'yicha 0–10 ball.</dd>
+                    <dt>SpO₂</dt>
+                    <dd class="small text-body-secondary mb-3">Qonning kislorod bilan to'yinganlik darajasi, pulsoksimetr bilan o'lchanadi (%).</dd>
+                    <dt>Me'yoriy diapazon</dt>
+                    <dd class="small text-body-secondary mb-0">Laboratoriya ko'rsatgan normal qiymatlar chegarasi. Natija undan tashqarida bo'lsa, tizim uni <span class="badge badge-soft-danger">↑ Yuqori</span> yoki <span class="badge badge-soft-danger">↓ Past</span> deb belgilaydi.</dd>
+                </dl>
+            </div>
+        </div>
+
+        <div class="alert alert-warning d-flex gap-2 small mb-0">
+            <i class="fa-solid fa-shield-heart mt-1"></i>
+            <div><strong>Muhim:</strong> NeuroMonitor shifokorga yordamchi vosita. Avtomatik baholar faqat kiritilgan me'yorga asoslanadi va klinik xulosa o'rnini bosmaydi.</div>
+        </div>
+    </div>
+</div>
+{% endblock %}

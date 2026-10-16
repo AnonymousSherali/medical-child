@@ -33,6 +33,24 @@ class DashboardView(LoginRequiredMixin, ListView):
         context['tests_today'] = LabTest.objects.filter(test_date__date=today).count()
         context['abnormal_count'] = NeuroProteinResult.objects.filter(is_abnormal=True).count()
         context['active_sessions'] = MonitoringSession.objects.filter(is_active=True).count()
+
+        # Grafik: faol bemorlar gestatsion yosh guruhlari bo'yicha (JSST tasnifi)
+        active = Patient.objects.filter(is_active=True)
+        context['gestation_chart'] = {
+            'labels': ['< 28 hafta', '28–31 hafta', '32–36 hafta', '≥ 37 hafta'],
+            'values': [
+                active.filter(gestational_age__lt=28).count(),
+                active.filter(gestational_age__gte=28, gestational_age__lt=32).count(),
+                active.filter(gestational_age__gte=32, gestational_age__lt=37).count(),
+                active.filter(gestational_age__gte=37).count(),
+            ],
+        }
+
+        # Shifokor e'tibori kerak bo'lgan so'nggi chetlashgan natijalar
+        context['recent_alerts'] = (
+            NeuroProteinResult.objects.filter(is_abnormal=True)
+            .select_related('lab_test__patient')[:5]
+        )
         return context
 
 
@@ -86,6 +104,38 @@ class PatientDetailView(LoginRequiredMixin, DetailView):
         )[:10]
         context['sessions'] = patient.monitoring_sessions.all()[:10]
         context['active_session'] = patient.monitoring_sessions.filter(is_active=True).first()
+
+        # Grafik: har bir neyro-oqsil turi bo'yicha vaqt davomida o'zgarish
+        results = (
+            NeuroProteinResult.objects.filter(lab_test__patient=patient)
+            .select_related('lab_test')
+            .order_by('lab_test__test_date', 'created_at')
+        )
+        # Har bir oqsil alohida grafikda: birliklari va qiymat diapazonlari keskin farq
+        # qiladi (NSE ~10–30 ng/ml, S100B ~1 µg/L), bitta o'qda kichiklari ko'rinmay qoladi.
+        series = {}
+        for result in results:
+            label = result.get_protein_type_display()
+            entry = series.setdefault(label, {
+                'label': label, 'unit': result.unit, 'points': [],
+                'ref_min': None, 'ref_max': None,
+            })
+            entry['points'].append({
+                't': result.lab_test.test_date.isoformat(),
+                'x': timezone.localtime(result.lab_test.test_date).strftime('%d.%m %H:%M'),
+                'y': float(result.value),
+                'abnormal': result.is_abnormal,
+            })
+            # Grafikdagi me'yor chizig'i uchun eng so'nggi kiritilgan me'yor olinadi
+            if result.reference_range_min is not None:
+                entry['ref_min'] = float(result.reference_range_min)
+            if result.reference_range_max is not None:
+                entry['ref_max'] = float(result.reference_range_max)
+        for entry in series.values():
+            latest = entry['points'][-1]
+            entry['latest'] = latest['y']
+            entry['latest_abnormal'] = latest['abnormal']
+        context['protein_chart'] = list(series.values())
         return context
 
 

@@ -1,192 +1,114 @@
 {% extends 'base.html' %}
+{% load crispy_forms_tags %}
 
-{% block title %}{% if object %}Bemorni tahrirlash{% else %}Yangi bemor{% endif %} - NeuroMonitor{% endblock %}
+{% block title %}{% if object %}Bemorni tahrirlash{% else %}Yangi bemor{% endif %}{% endblock %}
+{% block breadcrumbs %}
+<li class="breadcrumb-item"><a href="{% url 'patient-list' %}">Bemorlar</a></li>
+{% if object %}
+<li class="breadcrumb-item"><a href="{% url 'patient-detail' object.pk %}">{{ object.full_name }}</a></li>
+<li class="breadcrumb-item active">Tahrirlash</li>
+{% else %}
+<li class="breadcrumb-item active">Yangi bemor</li>
+{% endif %}
+{% endblock %}
+{% block page_title %}{% if object %}Bemorni tahrirlash{% else %}Yangi bemorni ro'yxatga olish{% endif %}{% endblock %}
+{% block page_subtitle %}<span class="text-danger">*</span> belgisi — majburiy maydonlar{% endblock %}
 
 {% block content %}
-<h1 class="mb-4">
-    <i class="fas fa-user-plus"></i>
-    {% if object %}Bemorni tahrirlash{% else %}Yangi bemor qo'shish{% endif %}
-</h1>
+<form method="post" novalidate>
+    {% csrf_token %}
 
-<div class="row">
-    <div class="col-lg-10">
-        <div class="card">
-            <div class="card-body">
-                {% if form.errors %}
-                <div class="alert alert-danger">
-                    <strong>Formada xatoliklar bor.</strong> Quyidagi maydonlarni tekshiring.
-                    {% for error in form.non_field_errors %}<div>{{ error }}</div>{% endfor %}
+    {% if form.errors %}
+    <div class="alert alert-danger d-flex gap-2" role="alert">
+        <i class="fa-solid fa-circle-exclamation mt-1"></i>
+        <div>
+            <strong>Formada xatoliklar bor.</strong> Qizil bilan belgilangan maydonlarni tekshiring.
+            {% for error in form.non_field_errors %}<div>{{ error }}</div>{% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="row g-4">
+        <div class="col-xl-8">
+            <div class="card">
+                <div class="card-body p-4">
+                    <div class="nm-form-section">
+                        <div class="nm-form-section-title"><span class="nm-step">1</span> Asosiy ma'lumotlar</div>
+                        <div class="row">
+                            <div class="col-md-6">{{ form.first_name|as_crispy_field }}</div>
+                            <div class="col-md-6">{{ form.last_name|as_crispy_field }}</div>
+                            <div class="col-md-4">{{ form.medical_record_number|as_crispy_field }}</div>
+                            <div class="col-md-3">{{ form.gender|as_crispy_field }}</div>
+                            <div class="col-md-5">{{ form.birth_date|as_crispy_field }}</div>
+                        </div>
+                    </div>
+
+                    <div class="nm-form-section">
+                        <div class="nm-form-section-title"><span class="nm-step">2</span> Tug'ilish parametrlari
+                            {% include 'includes/help_tip.html' with text="Gestatsion yosh 37 haftadan kam bo'lsa, bemor avtomatik ravishda 'chala tug'ilgan' deb belgilanadi." %}
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4">{{ form.gestational_age|as_crispy_field }}</div>
+                            <div class="col-md-4">{{ form.birth_weight|as_crispy_field }}</div>
+                            <div class="col-md-4">{{ form.birth_length|as_crispy_field }}</div>
+                            <div class="col-md-4">{{ form.head_circumference|as_crispy_field }}</div>
+                            <div class="col-md-4">{{ form.apgar_score_1min|as_crispy_field }}</div>
+                            <div class="col-md-4">{{ form.apgar_score_5min|as_crispy_field }}</div>
+                        </div>
+                    </div>
+
+                    <div class="nm-form-section">
+                        <div class="nm-form-section-title"><span class="nm-step">3</span> Ona ma'lumotlari</div>
+                        <div class="row">
+                            <div class="col-md-6">{{ form.mother_name|as_crispy_field }}</div>
+                            <div class="col-md-2">{{ form.mother_age|as_crispy_field }}</div>
+                            <div class="col-md-4">{{ form.mother_phone|as_crispy_field }}</div>
+                        </div>
+                    </div>
+
+                    <div class="nm-form-section">
+                        <div class="nm-form-section-title"><span class="nm-step">4</span> Klinik ma'lumotlar <span class="small text-body-secondary fw-normal">(ixtiyoriy)</span></div>
+                        {{ form.diagnosis|as_crispy_field }}
+                        {{ form.complications|as_crispy_field }}
+                        {{ form.treatment_plan|as_crispy_field }}
+                    </div>
                 </div>
-                {% endif %}
+            </div>
+        </div>
 
-                <form method="post" novalidate>
-                    {% csrf_token %}
+        <div class="col-xl-4">
+            {# Status maydonlari faqat tahrirlash formasida mavjud #}
+            {% if form.is_active %}
+            <div class="card mb-4">
+                <div class="card-header"><h2 class="card-title-sm"><i class="fa-solid fa-hospital-user"></i> Bemor holati</h2></div>
+                <div class="card-body">
+                    <div class="form-check form-switch mb-3">
+                        {{ form.is_active }}
+                        <label class="form-check-label fw-medium" for="{{ form.is_active.id_for_label }}">Davolanishda (faol)</label>
+                        {% for error in form.is_active.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+                    </div>
+                    {{ form.discharge_date|as_crispy_field }}
+                    <p class="small text-body-secondary mb-0">
+                        Bemorni chiqarish uchun "faol" belgisini olib tashlang va chiqarilgan sanani kiriting.
+                    </p>
+                </div>
+            </div>
+            {% endif %}
 
-                    <h5 class="border-bottom pb-2 mb-3">Asosiy ma'lumotlar</h5>
-                    <div class="row mb-3">
-                        <div class="col-md-6">
-                            <label for="{{ form.medical_record_number.id_for_label }}" class="form-label">
-                                Tibbiy karta raqami <span class="text-danger">*</span>
-                            </label>
-                            {{ form.medical_record_number }}
-                            {% for error in form.medical_record_number.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
-                        </div>
-                        <div class="col-md-6">
-                            <label for="{{ form.gender.id_for_label }}" class="form-label">
-                                Jinsi <span class="text-danger">*</span>
-                            </label>
-                            {{ form.gender }}
-                            {% for error in form.gender.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
-                        </div>
+            <div class="card position-sticky" style="top: calc(var(--nm-topbar-height) + 1rem)">
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary btn-lg"><i class="fa-solid fa-check me-1"></i> Saqlash</button>
+                        <a href="{% if object %}{% url 'patient-detail' object.pk %}{% else %}{% url 'patient-list' %}{% endif %}" class="btn btn-soft">Bekor qilish</a>
                     </div>
-                    <div class="row mb-3">
-                        <div class="col-md-6">
-                            <label for="{{ form.first_name.id_for_label }}" class="form-label">
-                                Ism <span class="text-danger">*</span>
-                            </label>
-                            {{ form.first_name }}
-                            {% for error in form.first_name.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
-                        </div>
-                        <div class="col-md-6">
-                            <label for="{{ form.last_name.id_for_label }}" class="form-label">
-                                Familiya <span class="text-danger">*</span>
-                            </label>
-                            {{ form.last_name }}
-                            {% for error in form.last_name.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
-                        </div>
-                    </div>
-                    <div class="row mb-4">
-                        <div class="col-md-6">
-                            <label for="{{ form.birth_date.id_for_label }}" class="form-label">
-                                Tug'ilgan sana va vaqt <span class="text-danger">*</span>
-                            </label>
-                            {{ form.birth_date }}
-                            {% for error in form.birth_date.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
-                        </div>
-                    </div>
-
-                    <h5 class="border-bottom pb-2 mb-3">Tug'ilish parametrlari</h5>
-                    <div class="row mb-3">
-                        <div class="col-md-4">
-                            <label for="{{ form.gestational_age.id_for_label }}" class="form-label">
-                                Gestatsion yoshi (hafta) <span class="text-danger">*</span>
-                            </label>
-                            {{ form.gestational_age }}
-                            {% for error in form.gestational_age.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
-                        </div>
-                        <div class="col-md-4">
-                            <label for="{{ form.birth_weight.id_for_label }}" class="form-label">
-                                Tug'ilish og'irligi (kg) <span class="text-danger">*</span>
-                            </label>
-                            {{ form.birth_weight }}
-                            {% for error in form.birth_weight.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
-                        </div>
-                        <div class="col-md-4">
-                            <label for="{{ form.birth_length.id_for_label }}" class="form-label">
-                                Tug'ilish bo'yi (sm) <span class="text-danger">*</span>
-                            </label>
-                            {{ form.birth_length }}
-                            {% for error in form.birth_length.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
-                        </div>
-                    </div>
-                    <div class="row mb-4">
-                        <div class="col-md-4">
-                            <label for="{{ form.head_circumference.id_for_label }}" class="form-label">
-                                Bosh aylanasi (sm) <span class="text-danger">*</span>
-                            </label>
-                            {{ form.head_circumference }}
-                            {% for error in form.head_circumference.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
-                        </div>
-                        <div class="col-md-4">
-                            <label for="{{ form.apgar_score_1min.id_for_label }}" class="form-label">
-                                Apgar (1 daqiqa) <span class="text-danger">*</span>
-                            </label>
-                            {{ form.apgar_score_1min }}
-                            {% for error in form.apgar_score_1min.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
-                        </div>
-                        <div class="col-md-4">
-                            <label for="{{ form.apgar_score_5min.id_for_label }}" class="form-label">
-                                Apgar (5 daqiqa) <span class="text-danger">*</span>
-                            </label>
-                            {{ form.apgar_score_5min }}
-                            {% for error in form.apgar_score_5min.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
-                        </div>
-                    </div>
-
-                    <h5 class="border-bottom pb-2 mb-3">Ona ma'lumotlari</h5>
-                    <div class="row mb-3">
-                        <div class="col-md-8">
-                            <label for="{{ form.mother_name.id_for_label }}" class="form-label">
-                                Ona FIO <span class="text-danger">*</span>
-                            </label>
-                            {{ form.mother_name }}
-                            {% for error in form.mother_name.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
-                        </div>
-                        <div class="col-md-4">
-                            <label for="{{ form.mother_age.id_for_label }}" class="form-label">
-                                Ona yoshi <span class="text-danger">*</span>
-                            </label>
-                            {{ form.mother_age }}
-                            {% for error in form.mother_age.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
-                        </div>
-                    </div>
-                    <div class="row mb-4">
-                        <div class="col-md-6">
-                            <label for="{{ form.mother_phone.id_for_label }}" class="form-label">
-                                Ona telefoni <span class="text-danger">*</span>
-                            </label>
-                            {{ form.mother_phone }}
-                            {% for error in form.mother_phone.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
-                        </div>
-                    </div>
-
-                    <h5 class="border-bottom pb-2 mb-3">Tibbiy ma'lumotlar</h5>
-                    <div class="mb-3">
-                        <label for="{{ form.diagnosis.id_for_label }}" class="form-label">Tashxis</label>
-                        {{ form.diagnosis }}
-                    </div>
-                    <div class="mb-3">
-                        <label for="{{ form.complications.id_for_label }}" class="form-label">Asoratlar</label>
-                        {{ form.complications }}
-                    </div>
-                    <div class="mb-4">
-                        <label for="{{ form.treatment_plan.id_for_label }}" class="form-label">Davolash rejasi</label>
-                        {{ form.treatment_plan }}
-                    </div>
-
-                    {# Status maydonlari faqat tahrirlash formasida mavjud #}
-                    {% if form.is_active %}
-                    <h5 class="border-bottom pb-2 mb-3">Status</h5>
-                    <div class="row mb-4">
-                        <div class="col-md-6">
-                            <div class="form-check mt-2">
-                                {{ form.is_active }}
-                                <label class="form-check-label" for="{{ form.is_active.id_for_label }}">
-                                    Bemor faol (davolanishda)
-                                </label>
-                            </div>
-                            {% for error in form.is_active.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
-                        </div>
-                        <div class="col-md-6">
-                            <label for="{{ form.discharge_date.id_for_label }}" class="form-label">Chiqarilgan sana</label>
-                            {{ form.discharge_date }}
-                            {% for error in form.discharge_date.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
-                        </div>
-                    </div>
-                    {% endif %}
-
-                    <div class="d-flex justify-content-end gap-2">
-                        <a href="{% if object %}{% url 'patient-detail' object.pk %}{% else %}{% url 'patient-list' %}{% endif %}"
-                           class="btn btn-secondary">
-                            <i class="fas fa-times"></i> Bekor qilish
-                        </a>
-                        <button type="submit" class="btn btn-primary">
-                            <i class="fas fa-save"></i> Saqlash
-                        </button>
-                    </div>
-                </form>
+                    <hr>
+                    <p class="small text-body-secondary mb-0">
+                        <i class="fa-solid fa-circle-info me-1"></i>
+                        Saqlangandan so'ng bemor sahifasida tahlil buyurtma qilish, monitoring boshlash va tarixga yozuv qo'shish mumkin.
+                    </p>
+                </div>
             </div>
         </div>
     </div>
-</div>
+</form>
 {% endblock %}

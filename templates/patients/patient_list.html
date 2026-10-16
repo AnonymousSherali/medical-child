@@ -1,116 +1,98 @@
 {% extends 'base.html' %}
 
-{% block title %}Bemorlar ro'yxati - NeuroMonitor{% endblock %}
+{% block title %}Bemorlar{% endblock %}
+{% block breadcrumbs %}<li class="breadcrumb-item active">Bemorlar</li>{% endblock %}
+{% block page_title %}Bemorlar{% endblock %}
+{% block page_subtitle %}Barcha ro'yxatga olingan yangi tug'ilganlar{% endblock %}
+{% block page_actions %}
+<a href="{% url 'export-patients' %}" class="btn btn-soft"><i class="fa-solid fa-file-csv me-1"></i> Excel (CSV)</a>
+<a href="{% url 'patient-create' %}" class="btn btn-primary"><i class="fa-solid fa-plus me-1"></i> Yangi bemor</a>
+{% endblock %}
 
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
-    <h1 class="mb-0"><i class="fas fa-user-injured"></i> Bemorlar ro'yxati</h1>
-    <div class="d-flex gap-2">
-        <a href="{% url 'export-patients' %}" class="btn btn-outline-success">
-            <i class="fas fa-file-csv"></i> CSV
-        </a>
-        <a href="{% url 'patient-create' %}" class="btn btn-primary">
-            <i class="fas fa-plus"></i> Yangi bemor
-        </a>
-    </div>
-</div>
-
-<div class="card mb-4">
-    <div class="card-body">
-        <form method="get" class="row g-2 align-items-end">
-            <div class="col-md-6">
-                <label class="form-label">Qidiruv</label>
-                <input type="search" name="q" value="{{ query }}" class="form-control"
-                       placeholder="Ism, familiya, karta raqami yoki ona FIO">
+<div class="card">
+    <div class="card-body nm-filter-bar border-bottom">
+        <form method="get" class="row g-2 align-items-center">
+            <div class="col-md">
+                <div class="position-relative">
+                    <i class="fa-solid fa-magnifying-glass position-absolute top-50 translate-middle-y ms-3 text-body-secondary"></i>
+                    <input type="search" name="q" value="{{ query }}" class="form-control ps-5"
+                           placeholder="Ism, familiya, karta raqami yoki ona FIO" aria-label="Qidiruv">
+                </div>
             </div>
             <div class="col-md-3">
-                <label class="form-label">Holat</label>
-                <select name="status" class="form-select">
-                    <option value="">Barchasi</option>
+                <select name="status" class="form-select" aria-label="Holat" onchange="this.form.submit()">
+                    <option value="">Barcha holatlar</option>
                     <option value="active" {% if status == 'active' %}selected{% endif %}>Faol</option>
                     <option value="discharged" {% if status == 'discharged' %}selected{% endif %}>Chiqarilgan</option>
                 </select>
             </div>
-            <div class="col-md-3 d-flex gap-2">
-                <button type="submit" class="btn btn-primary">
-                    <i class="fas fa-search"></i> Qidirish
-                </button>
-                <a href="{% url 'patient-list' %}" class="btn btn-outline-secondary">Tozalash</a>
+            <div class="col-md-auto d-flex gap-2">
+                <button type="submit" class="btn btn-primary"><i class="fa-solid fa-search me-1"></i> Qidirish</button>
+                {% if query or status %}
+                <a href="{% url 'patient-list' %}" class="btn btn-soft" title="Filtrni tozalash"><i class="fa-solid fa-xmark"></i></a>
+                {% endif %}
             </div>
         </form>
     </div>
-</div>
 
-<div class="card">
+    {% if patients %}
+    <div class="table-responsive">
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>Bemor</th>
+                    <th class="d-none d-md-table-cell">Tug'ilgan</th>
+                    <th>Gestatsion yosh</th>
+                    <th class="d-none d-md-table-cell">Og'irligi</th>
+                    <th>Holat</th>
+                    <th class="text-end">Amallar</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for patient in patients %}
+                <tr>
+                    <td>
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="nm-avatar">{{ patient.first_name|first|upper }}{{ patient.last_name|first|upper }}</span>
+                            <div>
+                                <a class="table-link" href="{% url 'patient-detail' patient.pk %}">{{ patient.full_name }}</a>
+                                <div class="text-muted-sm">№ {{ patient.medical_record_number }} · {{ patient.get_gender_display }}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="d-none d-md-table-cell">{{ patient.birth_date|date:"d.m.Y" }}<div class="text-muted-sm">{{ patient.age_in_days }} kunlik</div></td>
+                    <td>
+                        {{ patient.gestational_age }} hafta
+                        {% if patient.is_preterm %}<span class="badge badge-soft-warning ms-1">chala</span>{% endif %}
+                    </td>
+                    <td class="d-none d-md-table-cell">{{ patient.birth_weight|num }} kg</td>
+                    <td>
+                        {% if patient.is_active %}
+                        <span class="badge badge-soft-success"><i class="fa-solid fa-circle fa-2xs me-1"></i>Faol</span>
+                        {% else %}
+                        <span class="badge badge-soft-secondary">Chiqarilgan</span>
+                        {% endif %}
+                    </td>
+                    <td class="text-end text-nowrap">
+                        <a href="{% url 'patient-detail' patient.pk %}" class="btn btn-sm btn-soft" title="Ko'rish"><i class="fa-solid fa-eye"></i></a>
+                        <a href="{% url 'patient-update' patient.pk %}" class="btn btn-sm btn-soft" title="Tahrirlash"><i class="fa-solid fa-pen"></i></a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% include 'includes/pagination.html' %}
+    {% else %}
     <div class="card-body">
-        {% if patients %}
-        <div class="table-responsive">
-            <table class="table table-hover">
-                <thead>
-                    <tr>
-                        <th>Karta №</th>
-                        <th>FIO</th>
-                        <th>Jinsi</th>
-                        <th>Tug'ilgan sana</th>
-                        <th>Gestatsion yoshi</th>
-                        <th>Og'irligi</th>
-                        <th>Holat</th>
-                        <th>Amallar</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for patient in patients %}
-                    <tr>
-                        <td>{{ patient.medical_record_number }}</td>
-                        <td>
-                            <a href="{% url 'patient-detail' patient.pk %}">{{ patient.full_name }}</a>
-                        </td>
-                        <td>{{ patient.get_gender_display }}</td>
-                        <td>{{ patient.birth_date|date:"d.m.Y H:i" }}</td>
-                        <td>
-                            {{ patient.gestational_age }} hafta
-                            {% if patient.is_preterm %}
-                            <span class="badge bg-warning text-dark">chala</span>
-                            {% endif %}
-                        </td>
-                        <td>{{ patient.birth_weight }} kg</td>
-                        <td>
-                            {% if patient.is_active %}
-                            <span class="badge bg-success">Faol</span>
-                            {% else %}
-                            <span class="badge bg-secondary">Chiqarilgan</span>
-                            {% endif %}
-                        </td>
-                        <td>
-                            <a href="{% url 'patient-detail' patient.pk %}" class="btn btn-sm btn-info" title="Ko'rish">
-                                <i class="fas fa-eye"></i>
-                            </a>
-                            <a href="{% url 'patient-update' patient.pk %}" class="btn btn-sm btn-warning" title="Tahrirlash">
-                                <i class="fas fa-edit"></i>
-                            </a>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-
-        {% include 'includes/pagination.html' %}
-
+        {% if query or status %}
+        {% include 'includes/empty_state.html' with icon='fa-magnifying-glass' title="Hech narsa topilmadi" text="Qidiruv so'zini o'zgartiring yoki filtrni tozalang." %}
         {% else %}
-        <div class="text-center text-muted py-5">
-            <i class="fas fa-user-injured fa-4x mb-3"></i>
-            {% if query or status %}
-            <p>Qidiruv bo'yicha bemor topilmadi</p>
-            <a href="{% url 'patient-list' %}" class="btn btn-outline-secondary">Filtrni tozalash</a>
-            {% else %}
-            <p>Bemorlar topilmadi</p>
-            <a href="{% url 'patient-create' %}" class="btn btn-primary">
-                <i class="fas fa-plus"></i> Yangi bemor qo'shish
-            </a>
-            {% endif %}
-        </div>
+        {% url 'patient-create' as create_url %}
+        {% include 'includes/empty_state.html' with icon='fa-baby' title="Hozircha bemorlar yo'q" text="Birinchi bemorni ro'yxatga oling." action_url=create_url action_label="Bemor qo'shish" %}
         {% endif %}
     </div>
+    {% endif %}
 </div>
 {% endblock %}

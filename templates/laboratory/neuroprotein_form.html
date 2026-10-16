@@ -1,60 +1,44 @@
-{% extends 'base.html' %}
+{% extends 'layouts/form_page.html' %}
 {% load crispy_forms_tags %}
 
-{% block title %}Neyro-oqsil Natijasi - NeuroMonitor{% endblock %}
+{% block title %}Neyro-oqsil natijasi{% endblock %}
+{% block breadcrumbs %}
+<li class="breadcrumb-item"><a href="{% url 'labtest-list' %}">Tahlillar</a></li>
+<li class="breadcrumb-item"><a href="{% url 'labtest-detail' lab_test.pk %}">{{ lab_test.get_test_type_display }}</a></li>
+<li class="breadcrumb-item active">Neyro-oqsil natijasi</li>
+{% endblock %}
+{% block page_title %}Neyro-oqsil natijasini kiritish{% endblock %}
+{% block page_subtitle %}NSE, S100B yoki GFAP qiymati{% endblock %}
 
-{% block content %}
-<div class="row">
-    <div class="col-12">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h1>
-                <i class="fas fa-atom"></i> Neyro-oqsil Natijasini Kiritish
-            </h1>
-            <a href="{% url 'labtest-detail' lab_test.pk %}" class="btn btn-secondary">
-                <i class="fas fa-arrow-left"></i> Orqaga
-            </a>
-        </div>
-    </div>
+{% block form_context %}
+<div class="nm-context-bar">
+    <div><span>Bemor:</span> <strong>{{ lab_test.patient.full_name }}</strong></div>
+    <div><span>Tahlil:</span> <strong>{{ lab_test.get_test_type_display }}</strong></div>
+    <div><span>Sana:</span> <strong>{{ lab_test.test_date|date:"d.m.Y H:i" }}</strong></div>
 </div>
+{% endblock %}
 
-<div class="row">
-    <div class="col-lg-8 offset-lg-2">
-        <div class="card mb-3">
-            <div class="card-body bg-light">
-                <strong>Bemor:</strong> {{ lab_test.patient }}
-                &nbsp;|&nbsp;
-                <strong>Tahlil:</strong> {{ lab_test.get_test_type_display }}
-                &nbsp;|&nbsp;
-                <strong>Sana:</strong> {{ lab_test.test_date|date:"d.m.Y" }}
-            </div>
-        </div>
-
-        <div class="card">
-            <div class="card-header bg-primary text-white">
-                <h5 class="mb-0">
-                    <i class="fas fa-flask"></i> NSE / S100B / GFAP Ko'rsatkichi
-                </h5>
-            </div>
-            <div class="card-body">
-                <div class="alert alert-info">
-                    <i class="fas fa-info-circle"></i>
-                    Me'yoriy diapazonni kiritsangiz, tizim avtomatik ravishda natija me'yordan
-                    chetlashganligini aniqlaydi.
-                </div>
-                <form method="post">
-                    {% csrf_token %}
-                    {{ form|crispy }}
-                    <div class="d-flex justify-content-end gap-2 mt-3">
-                        <a href="{% url 'labtest-detail' lab_test.pk %}" class="btn btn-secondary">
-                            <i class="fas fa-times"></i> Bekor qilish
-                        </a>
-                        <button type="submit" class="btn btn-primary">
-                            <i class="fas fa-save"></i> Saqlash
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
+{% block form_intro %}
+<div class="alert alert-info d-flex gap-2 small">
+    <i class="fa-solid fa-wand-magic-sparkles mt-1"></i>
+    <div>
+        Laboratoriyangizning <strong>me'yoriy diapazonini</strong> kiritsangiz, tizim natijani avtomatik baholaydi
+        va chetlashgan qiymatni bosh sahifada ogohlantirish sifatida ko'rsatadi. Me'yor tahlil usuli va
+        gestatsion yoshga bog'liq bo'lgani uchun uni laboratoriya hisobotidan oling.
     </div>
 </div>
 {% endblock %}
+
+{% block form_fields %}
+<div class="row">
+    <div class="col-md-4">{{ form.protein_type|as_crispy_field }}</div>
+    <div class="col-md-5">{{ form.value|as_crispy_field }}</div>
+    <div class="col-md-3">{{ form.unit|as_crispy_field }}</div>
+    <div class="col-md-6">{{ form.reference_range_min|as_crispy_field }}</div>
+    <div class="col-md-6">{{ form.reference_range_max|as_crispy_field }}</div>
+    <div class="col-12">{{ form.interpretation|as_crispy_field }}</div>
+</div>
+{% endblock %}
+
+{% block cancel_url %}{% url 'labtest-detail' lab_test.pk %}{% endblock %}
+{% block submit_label %}Natijani saqlash{% endblock %}

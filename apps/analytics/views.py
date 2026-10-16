@@ -1,7 +1,7 @@
 import csv
 
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.db.models import Avg, Count
+from django.db.models import Avg, Count, Q
 from django.http import HttpResponse
 from django.utils import timezone
 from django.views import View
@@ -39,16 +39,36 @@ class AnalyticsDashboardView(LoginRequiredMixin, TemplateView):
 
         # Oqsil turi bo'yicha taqsimot
         protein_labels = dict(NeuroProteinResult.PROTEIN_TYPE_CHOICES)
-        protein_stats = []
-        for row in results.values('protein_type').annotate(total=Count('id')).order_by('protein_type'):
-            protein_type = row['protein_type']
-            protein_stats.append({
-                'label': protein_labels.get(protein_type, protein_type),
+        # Bitta GROUP BY so'rovi (avval har bir tur uchun 2 ta qo'shimcha so'rov bajarilardi)
+        rows = (
+            results.values('protein_type')
+            .annotate(
+                total=Count('id'),
+                abnormal=Count('id', filter=Q(is_abnormal=True)),
+                average=Avg('value'),
+            )
+            .order_by('protein_type')
+        )
+        protein_stats = [
+            {
+                'label': protein_labels.get(row['protein_type'], row['protein_type']),
                 'total': row['total'],
-                'abnormal': results.filter(protein_type=protein_type, is_abnormal=True).count(),
-                'average': results.filter(protein_type=protein_type).aggregate(v=Avg('value'))['v'],
-            })
+                'abnormal': row['abnormal'],
+                'normal': row['total'] - row['abnormal'],
+                'average': row['average'],
+            }
+            for row in rows
+        ]
         context['protein_stats'] = protein_stats
+        context['protein_chart'] = {
+            'labels': [s['label'] for s in protein_stats],
+            'normal': [s['normal'] for s in protein_stats],
+            'abnormal': [s['abnormal'] for s in protein_stats],
+        }
+        context['test_status_chart'] = {
+            'labels': ['Tugallangan', 'Jarayonda'],
+            'values': [context['completed_tests'], context['pending_tests']],
+        }
 
         context['active_sessions'] = MonitoringSession.objects.filter(is_active=True).count()
         context['total_sessions'] = MonitoringSession.objects.count()

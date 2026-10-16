@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Profil{% endblock %}
+{% block breadcrumbs %}<li class="breadcrumb-item active">Profil</li>{% endblock %}
+{% block page_title %}Mening profilim{% endblock %}
+{% block page_subtitle %}Shaxsiy ma'lumotlaringiz va hisob sozlamalari{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-body text-center p-4">
+                <span class="nm-avatar nm-avatar-lg mb-3">{{ user.first_name|first|default:user.username|first|upper }}{{ user.last_name|first|upper }}</span>
+                <h5 class="mb-1">{{ user.get_full_name|default:user.username }}</h5>
+                <span class="badge badge-soft-primary">{{ user.get_role_display }}</span>
+                <dl class="nm-info-list text-start mt-4 small">
+                    <dt>Login</dt><dd>{{ user.username }}</dd>
+                    <dt>Bo'lim</dt><dd>{{ user.department|default:"—" }}</dd>
+                    <dt>Ro'yxatdan o'tgan</dt><dd>{{ user.date_joined|date:"d.m.Y" }}</dd>
+                    <dt>Oxirgi kirish</dt><dd>{{ user.last_login|date:"d.m.Y H:i"|default:"—" }}</dd>
+                </dl>
+                <a href="{% url 'password-change' %}" class="btn btn-soft w-100 mt-4">
+                    <i class="fa-solid fa-key me-1"></i> Parolni o'zgartirish
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header"><h2 class="card-title-sm"><i class="fa-solid fa-user-pen"></i> Ma'lumotlarni tahrirlash</h2></div>
+            <div class="card-body p-4">
+                <form method="post" novalidate>
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-md-6">{{ form.first_name|as_crispy_field }}</div>
+                        <div class="col-md-6">{{ form.last_name|as_crispy_field }}</div>
+                        <div class="col-md-6">{{ form.email|as_crispy_field }}</div>
+                        <div class="col-md-6">{{ form.phone|as_crispy_field }}</div>
+                        <div class="col-12">{{ form.department|as_crispy_field }}</div>
+                    </div>
+                    <div class="nm-form-actions">
+                        <button type="submit" class="btn btn-primary px-4"><i class="fa-solid fa-check me-1"></i>Saqlash</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
