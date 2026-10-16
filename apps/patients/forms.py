@@ -51,6 +51,7 @@ class PatientForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         # datetime-local input mavjud qiymatni faqat shu formatda tanaydi
         self.fields['birth_date'].input_formats = DATETIME_INPUT_FORMATS
+        self.fields['gender'].choices = [('', 'Tanlang…')] + list(Patient.GENDER_CHOICES)
 
     def clean_gestational_age(self):
         age = self.cleaned_data.get('gestational_age')

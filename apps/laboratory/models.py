@@ -84,8 +84,12 @@ class LabTest(models.Model):
 
     @property
     def has_abnormal_results(self):
-        """Tahlilda me'yordan chetlashgan natija bormi."""
-        return self.neuro_protein_results.filter(is_abnormal=True).exists()
+        """Tahlilda me'yordan chetlashgan natija bormi.
+
+        `.all()` orqali o'qiladi, shunda prefetch_related ishlatilgan ro'yxatlarda
+        har bir tahlil uchun alohida so'rov (N+1) bajarilmaydi.
+        """
+        return any(result.is_abnormal for result in self.neuro_protein_results.all())
 
 
 class NeuroProteinResult(models.Model):
@@ -154,6 +158,21 @@ class NeuroProteinResult(models.Model):
 
     def __str__(self):
         return f"{self.get_protein_type_display()}: {self.value} {self.unit}"
+
+    @property
+    def deviation(self):
+        """Chetlashish yo'nalishi: 'high', 'low' yoki None (me'yorda / me'yor berilmagan).
+
+        Avval chetlashgan har qanday natija "me'yordan yuqori" deb ko'rsatilardi,
+        past qiymatlar uchun ham.
+        """
+        if self.value is None:
+            return None
+        if self.reference_range_max is not None and self.value > self.reference_range_max:
+            return 'high'
+        if self.reference_range_min is not None and self.value < self.reference_range_min:
+            return 'low'
+        return None
 
     def save(self, *args, **kwargs):
         # Me'yordan chetlashganligini avtomatik aniqlash.

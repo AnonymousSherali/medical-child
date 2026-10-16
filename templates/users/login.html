@@ -1,74 +1,106 @@
-{% extends 'base.html' %}
-{% load static %}
+{% extends 'layouts/minimal.html' %}
 
-{% block title %}Kirish - NeuroMonitor{% endblock %}
+{% block title %}Kirish · NeuroMonitor{% endblock %}
 
-{% block content %}
-<div class="row justify-content-center">
-    <div class="col-md-6 col-lg-4">
-        <div class="card shadow mt-5">
-            <div class="card-body p-5">
-                <div class="text-center mb-4">
-                    <i class="fas fa-brain fa-4x text-primary"></i>
-                    <h2 class="mt-3">NeuroMonitor</h2>
-                    <p class="text-muted">Tizimga kirish</p>
-                </div>
+{% block body %}
+<div class="nm-auth">
+    <section class="nm-auth-hero">
+        <div class="d-flex align-items-center gap-3">
+            <span class="nm-brand-logo"><i class="fa-solid fa-brain"></i></span>
+            <span class="fw-bold fs-5 text-white">NeuroMonitor</span>
+        </div>
 
-                <form method="post">
-                    {% csrf_token %}
-
-                    {% if form.non_field_errors %}
-                    <div class="alert alert-danger">
-                        {{ form.non_field_errors }}
-                    </div>
-                    {% endif %}
-
-                    <div class="mb-3">
-                        <label for="{{ form.username.id_for_label }}" class="form-label">
-                            Foydalanuvchi nomi
-                        </label>
-                        <div class="input-group">
-                            <span class="input-group-text"><i class="fas fa-user"></i></span>
-                            <input type="text"
-                                   name="{{ form.username.name }}"
-                                   class="form-control {% if form.username.errors %}is-invalid{% endif %}"
-                                   id="{{ form.username.id_for_label }}"
-                                   required>
-                        </div>
-                        {% if form.username.errors %}
-                        <div class="invalid-feedback d-block">
-                            {{ form.username.errors }}
-                        </div>
-                        {% endif %}
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="{{ form.password.id_for_label }}" class="form-label">
-                            Parol
-                        </label>
-                        <div class="input-group">
-                            <span class="input-group-text"><i class="fas fa-lock"></i></span>
-                            <input type="password"
-                                   name="{{ form.password.name }}"
-                                   class="form-control {% if form.password.errors %}is-invalid{% endif %}"
-                                   id="{{ form.password.id_for_label }}"
-                                   required>
-                        </div>
-                        {% if form.password.errors %}
-                        <div class="invalid-feedback d-block">
-                            {{ form.password.errors }}
-                        </div>
-                        {% endif %}
-                    </div>
-
-                    <div class="d-grid">
-                        <button type="submit" class="btn btn-primary btn-lg">
-                            <i class="fas fa-sign-in-alt"></i> Kirish
-                        </button>
-                    </div>
-                </form>
+        <div style="max-width: 460px">
+            <h1 class="mb-3">Chala tug'ilgan chaqaloqlar neyromonitoringi — bitta joyda</h1>
+            <p class="text-white-50 mb-4">
+                Neyro-spetsifik oqsillar, hayotiy ko'rsatkichlar va nevrologik baholashlarni
+                kuzatish uchun klinik axborot tizimi.
+            </p>
+            <div class="nm-auth-feature">
+                <i class="fa-solid fa-atom"></i>
+                <div><strong class="text-white">NSE, S100B, GFAP</strong><br>
+                    <span class="text-white-50 small">Me'yordan chetlashish avtomatik aniqlanadi</span></div>
+            </div>
+            <div class="nm-auth-feature">
+                <i class="fa-solid fa-heart-pulse"></i>
+                <div><strong class="text-white">Real vaqt monitoringi</strong><br>
+                    <span class="text-white-50 small">Hayotiy ko'rsatkichlar grafiklari va tarixi</span></div>
+            </div>
+            <div class="nm-auth-feature">
+                <i class="fa-solid fa-chart-line"></i>
+                <div><strong class="text-white">Analitika va eksport</strong><br>
+                    <span class="text-white-50 small">Statistika va Excel uchun CSV</span></div>
             </div>
         </div>
-    </div>
+
+        <p class="small text-white-50 mb-0">
+            <i class="fa-solid fa-shield-heart me-1"></i>
+            Tizim shifokorga yordamchi vosita. Klinik qarorlarni faqat shifokor qabul qiladi.
+        </p>
+    </section>
+
+    <section class="nm-auth-form">
+        <div class="nm-auth-card">
+            <div class="d-lg-none text-center mb-4">
+                <span class="nm-brand-logo d-inline-grid text-white"><i class="fa-solid fa-brain"></i></span>
+                <div class="fw-bold fs-5 mt-2">NeuroMonitor</div>
+            </div>
+
+            <h2 class="h3 mb-1">Xush kelibsiz</h2>
+            <p class="text-body-secondary mb-4">Davom etish uchun hisobingizga kiring</p>
+
+            {% if form.non_field_errors %}
+            <div class="alert alert-danger d-flex gap-2 align-items-start" role="alert">
+                <i class="fa-solid fa-circle-exclamation mt-1"></i>
+                <div>Login yoki parol noto'g'ri. Iltimos, qaytadan urinib ko'ring.</div>
+            </div>
+            {% endif %}
+
+            <form method="post" novalidate>
+                {% csrf_token %}
+                <input type="hidden" name="next" value="{{ next }}">
+                <div class="mb-3">
+                    <label for="{{ form.username.id_for_label }}" class="form-label">Foydalanuvchi nomi</label>
+                    <input type="text" name="{{ form.username.html_name }}" id="{{ form.username.id_for_label }}"
+                           value="{{ form.username.value|default:'' }}" class="form-control form-control-lg"
+                           autocomplete="username" autofocus required>
+                </div>
+                <div class="mb-4">
+                    <label for="{{ form.password.id_for_label }}" class="form-label">Parol</label>
+                    <div class="input-group">
+                        <input type="password" name="{{ form.password.html_name }}" id="{{ form.password.id_for_label }}"
+                               class="form-control form-control-lg" autocomplete="current-password" required>
+                        <button class="btn btn-soft" type="button" id="togglePassword" aria-label="Parolni ko'rsatish">
+                            <i class="fa-solid fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary btn-lg w-100">
+                    Kirish <i class="fa-solid fa-arrow-right ms-1"></i>
+                </button>
+            </form>
+
+            <p class="text-body-secondary small text-center mt-4 mb-0">
+                Hisobingiz yo'qmi? Tizim administratoriga murojaat qiling.
+            </p>
+            <div class="text-center mt-3">
+                <button class="btn btn-link btn-sm text-body-secondary text-decoration-none" type="button" data-theme-toggle>
+                    <i data-theme-icon class="fa-solid fa-moon me-1"></i> Rejimni almashtirish
+                </button>
+            </div>
+        </div>
+    </section>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.getElementById('togglePassword').addEventListener('click', function () {
+        var input = document.getElementById('{{ form.password.id_for_label }}');
+        var show = input.type === 'password';
+        input.type = show ? 'text' : 'password';
+        this.querySelector('i').className = show ? 'fa-solid fa-eye-slash' : 'fa-solid fa-eye';
+        this.setAttribute('aria-label', show ? 'Parolni yashirish' : "Parolni ko'rsatish");
+    });
+</script>
 {% endblock %}

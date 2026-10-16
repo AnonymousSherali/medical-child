@@ -77,7 +77,10 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'apps.core.context_processors.navigation',
             ],
+            # `num` filtri (o'nlik sonlarni ortiqcha nollarsiz chiqarish) har joyda ishlaydi
+            'builtins': ['apps.core.templatetags.format_tags'],
         },
     },
 ]

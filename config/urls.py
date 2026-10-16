@@ -6,8 +6,11 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 
+from apps.core.views import HelpView
+
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('yordam/', HelpView.as_view(), name='help'),
     path('', include('apps.patients.urls')),
     path('monitoring/', include('apps.monitoring.urls')),
     path('laboratory/', include('apps.laboratory.urls')),

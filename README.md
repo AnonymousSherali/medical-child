@@ -38,13 +38,22 @@ Chala tug'ilgan yangi tug'ilganlar markaziy asab tizimidagi perinatal shikastlan
 
 ### 5. Foydalanuvchilar va xavfsizlik
 - Rolga asoslangan hisoblar: shifokor, hamshira, laborant, administrator
+- Yangi xodim hisobini faqat administrator yaratadi (o'z-o'zini ro'yxatdan o'tkazish yopiq)
+- Profil va parolni o'zgartirish sahifalari
 - Barcha sahifalar autentifikatsiya talab qiladi
 - CSRF, XSS va SQL injection himoyasi (Django standart mexanizmlari)
 - Admin panel barcha modellar uchun sozlangan
 
+### 6. Interfeys
+- Zamonaviy dizayn: yon menyu, yorug'/qorong'i rejim, mobil qurilmalarga moslashgan
+- Grafiklar (Chart.js): gestatsion yosh taqsimoti, har bir neyro-oqsil dinamikasi
+  me'yor chiziqlari bilan, hayotiy ko'rsatkichlar, analitika
+- Bosh sahifada "E'tibor talab qiladi" — me'yordan chetlashgan so'nggi natijalar
+- "Yordam va atamalar" sahifasi: ish tartibi, FAQ, tibbiy atamalar lug'ati (NSE, S100B, GFAP, Apgar)
+- Tibbiy maydonlar yonida tushuntirish belgilari, bemor kartasini chop etish
+
 ### Rejadagi imkoniyatlar (hozircha amalga oshirilmagan)
 - PDF formatda hisobot generatsiyasi
-- Grafik/diagrammalar (Chart.js)
 - Celery orqali fon vazifalari va avtomatik ogohlantirishlar
 - Sun'iy intellekt asosida xavf darajasini prognozlash
 - Laboratoriya tizimlaridan avtomatik import (REST API)
@@ -55,7 +64,8 @@ Chala tug'ilgan yangi tug'ilganlar markaziy asab tizimidagi perinatal shikastlan
 - **Django 4.2** - asosiy web framework
 - **SQLite** - development ma'lumotlar bazasi (PostgreSQL ixtiyoriy)
 - **django-crispy-forms + crispy-bootstrap5** - forma renderi
-- **Bootstrap 5** - responsive dizayn (CDN)
+- **Bootstrap 5.3** - responsive dizayn, yorug'/qorong'i rejim (CDN)
+- **Chart.js 4** - grafiklar (CDN)
 - **Font Awesome 6** - ikonkalar (CDN)
 
 ### Ixtiyoriy / production uchun
@@ -71,7 +81,7 @@ Chala tug'ilgan yangi tug'ilganlar markaziy asab tizimidagi perinatal shikastlan
 python manage.py test
 ```
 
-39 ta test: modellar, forma validatsiyasi, view'lar va admin sahifalari.
+58 ta test: modellar, forma validatsiyasi, view'lar, ruxsatlar, grafik ma'lumotlari va admin sahifalari.
 
 ## O'rnatish
 

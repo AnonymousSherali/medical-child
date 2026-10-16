@@ -224,7 +224,7 @@ python manage.py createsuperuser
 ## Avtomatik testlar
 
 ```bash
-python manage.py test                 # barchasi (39 ta)
+python manage.py test                 # barchasi (58 ta)
 python manage.py test apps.patients   # bitta app
 ```
 

@@ -1,0 +1,13 @@
+{% extends 'layouts/minimal.html' %}
+{% comment %}500 sahifasi request kontekstisiz chiziladi — bu yerda user/request ishlatilmaydi.{% endcomment %}
+{% block title %}Server xatosi · NeuroMonitor{% endblock %}
+{% block body %}
+<div class="nm-error">
+    <div>
+        <div class="nm-error-code">500</div>
+        <h1 class="h3 mt-3">Kutilmagan xatolik yuz berdi</h1>
+        <p class="text-body-secondary mb-4">Xatolik qayd etildi. Bir ozdan so'ng qayta urinib ko'ring.<br>Muammo takrorlansa, administratorga xabar bering.</p>
+        <a href="/" class="btn btn-primary"><i class="fa-solid fa-house me-1"></i> Bosh sahifaga qaytish</a>
+    </div>
+</div>
+{% endblock %}

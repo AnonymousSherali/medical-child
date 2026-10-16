@@ -1,109 +1,75 @@
 {% extends 'base.html' %}
 
-{% block title %}Neyro-oqsil natijalari - NeuroMonitor{% endblock %}
+{% block title %}Neyro-oqsil natijalari{% endblock %}
+{% block breadcrumbs %}
+<li class="breadcrumb-item"><a href="{% url 'labtest-list' %}">Tahlillar</a></li>
+<li class="breadcrumb-item active">Neyro-oqsillar</li>
+{% endblock %}
+{% block page_title %}Neyro-oqsil natijalari{% endblock %}
+{% block page_subtitle %}Barcha bemorlar bo'yicha NSE, S100B va GFAP qiymatlari{% endblock %}
+{% block page_actions %}
+<a href="{% url 'export-neuroprotein' %}" class="btn btn-soft"><i class="fa-solid fa-file-csv me-1"></i> Excel (CSV)</a>
+{% endblock %}
 
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
-    <h1 class="mb-0"><i class="fas fa-atom"></i> Neyro-oqsil natijalari</h1>
-    <div class="d-flex gap-2">
-        <a href="{% url 'export-neuroprotein' %}" class="btn btn-outline-success">
-            <i class="fas fa-file-csv"></i> CSV yuklab olish
-        </a>
-        <a href="{% url 'labtest-list' %}" class="btn btn-secondary">
-            <i class="fas fa-arrow-left"></i> Tahlillar
-        </a>
-    </div>
-</div>
-
-<div class="card mb-4">
-    <div class="card-body">
-        <form method="get" class="row g-2 align-items-end">
-            <div class="col-md-4">
-                <label class="form-label">Oqsil turi</label>
-                <select name="protein_type" class="form-select">
-                    <option value="">Barchasi</option>
-                    {% for value, label in protein_types %}
-                    <option value="{{ value }}" {% if selected_protein == value %}selected{% endif %}>{{ label }}</option>
-                    {% endfor %}
-                </select>
+<div class="card">
+    <div class="card-body border-bottom py-3">
+        <form method="get" class="d-flex flex-wrap align-items-center gap-2">
+            <div class="btn-group" role="group" aria-label="Oqsil turi">
+                <input type="radio" class="btn-check" name="protein_type" id="pt-all" value="" {% if not selected_protein %}checked{% endif %} onchange="this.form.submit()">
+                <label class="btn btn-sm btn-outline-primary" for="pt-all">Barchasi</label>
+                {% for value, label in protein_types %}
+                <input type="radio" class="btn-check" name="protein_type" id="pt-{{ value }}" value="{{ value }}" {% if selected_protein == value %}checked{% endif %} onchange="this.form.submit()">
+                <label class="btn btn-sm btn-outline-primary" for="pt-{{ value }}">{{ label }}</label>
+                {% endfor %}
             </div>
-            <div class="col-md-4">
-                <div class="form-check mt-4">
-                    <input class="form-check-input" type="checkbox" name="abnormal" value="1"
-                           id="abnormalOnly" {% if abnormal_only %}checked{% endif %}>
-                    <label class="form-check-label" for="abnormalOnly">
-                        Faqat me'yordan chetlashganlar
-                    </label>
-                </div>
+            <div class="form-check form-switch ms-md-3 mb-0">
+                <input class="form-check-input" type="checkbox" role="switch" name="abnormal" value="1" id="abnormalOnly"
+                       {% if abnormal_only %}checked{% endif %} onchange="this.form.submit()">
+                <label class="form-check-label" for="abnormalOnly">Faqat chetlashganlar</label>
             </div>
-            <div class="col-md-4 d-flex gap-2">
-                <button type="submit" class="btn btn-primary">
-                    <i class="fas fa-filter"></i> Filtrlash
-                </button>
-                <a href="{% url 'neuroprotein-list' %}" class="btn btn-outline-secondary">Tozalash</a>
-            </div>
+            <noscript><button type="submit" class="btn btn-sm btn-primary">Filtrlash</button></noscript>
         </form>
     </div>
-</div>
 
-<div class="card">
-    <div class="card-body">
-        {% if results %}
-        <div class="table-responsive">
-            <table class="table table-hover">
-                <thead>
-                    <tr>
-                        <th>Bemor</th>
-                        <th>Oqsil turi</th>
-                        <th>Qiymat</th>
-                        <th>Me'yor</th>
-                        <th>Holat</th>
-                        <th>Sana</th>
-                        <th>Tahlil</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for result in results %}
-                    <tr>
-                        <td>
-                            <a href="{% url 'patient-detail' result.lab_test.patient.pk %}">
-                                {{ result.lab_test.patient.full_name }}
-                            </a>
-                        </td>
-                        <td><strong>{{ result.get_protein_type_display }}</strong></td>
-                        <td>{{ result.value }} {{ result.unit }}</td>
-                        <td>
-                            {% if result.reference_range_min is not None and result.reference_range_max is not None %}
-                                {{ result.reference_range_min }} – {{ result.reference_range_max }}
-                            {% else %}—{% endif %}
-                        </td>
-                        <td>
-                            {% if result.is_abnormal %}
-                            <span class="badge bg-danger">Chetlashgan</span>
-                            {% else %}
-                            <span class="badge bg-success">Me'yorda</span>
-                            {% endif %}
-                        </td>
-                        <td>{{ result.created_at|date:"d.m.Y H:i" }}</td>
-                        <td>
-                            <a href="{% url 'labtest-detail' result.lab_test.pk %}" class="btn btn-sm btn-info">
-                                <i class="fas fa-eye"></i>
-                            </a>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-
-        {% include 'includes/pagination.html' %}
-
-        {% else %}
-        <div class="text-center text-muted py-5">
-            <i class="fas fa-atom fa-4x mb-3"></i>
-            <p>Natijalar topilmadi</p>
-        </div>
-        {% endif %}
+    {% if results %}
+    <div class="table-responsive">
+        <table class="table table-hover">
+            <thead>
+                <tr><th>Bemor</th><th>Oqsil</th><th>Qiymat</th><th>Me'yor</th><th>Baho</th><th>Sana</th><th class="text-end"></th></tr>
+            </thead>
+            <tbody>
+                {% for result in results %}
+                <tr>
+                    <td>
+                        <a class="table-link" href="{% url 'patient-detail' result.lab_test.patient.pk %}">{{ result.lab_test.patient.full_name }}</a>
+                        <div class="text-muted-sm">№ {{ result.lab_test.patient.medical_record_number }}</div>
+                    </td>
+                    <td><strong>{{ result.get_protein_type_display }}</strong></td>
+                    <td class="fw-semibold {% if result.is_abnormal %}text-danger{% endif %}">{{ result.value|num }} <span class="text-body-secondary fw-normal small">{{ result.unit }}</span></td>
+                    <td class="text-nowrap">
+                        {% if result.reference_range_min is not None or result.reference_range_max is not None %}
+                        {{ result.reference_range_min|num|default:"…" }} – {{ result.reference_range_max|num|default:"…" }}
+                        {% else %}<span class="text-body-secondary">—</span>{% endif %}
+                    </td>
+                    <td>
+                        {% if result.deviation == 'high' %}<span class="badge badge-soft-danger"><i class="fa-solid fa-arrow-up me-1"></i>Yuqori</span>
+                        {% elif result.deviation == 'low' %}<span class="badge badge-soft-danger"><i class="fa-solid fa-arrow-down me-1"></i>Past</span>
+                        {% elif result.reference_range_min is not None or result.reference_range_max is not None %}<span class="badge badge-soft-success">Me'yorda</span>
+                        {% else %}<span class="badge badge-soft-secondary">Baholanmagan</span>{% endif %}
+                    </td>
+                    <td class="text-nowrap">{{ result.lab_test.test_date|date:"d.m.Y" }}</td>
+                    <td class="text-end"><a href="{% url 'labtest-detail' result.lab_test.pk %}" class="btn btn-sm btn-soft" title="Tahlilni ochish"><i class="fa-solid fa-arrow-right"></i></a></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
+    {% include 'includes/pagination.html' %}
+    {% else %}
+    <div class="card-body">
+        {% include 'includes/empty_state.html' with icon='fa-atom' title="Natijalar topilmadi" text="Natijalar tahlil sahifasidagi 'Neyro-oqsil' tugmasi orqali kiritiladi." %}
+    </div>
+    {% endif %}
 </div>
 {% endblock %}

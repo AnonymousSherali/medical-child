@@ -13,6 +13,9 @@ class MonitoringSessionForm(forms.ModelForm):
             'patient': forms.Select(attrs={'class': 'form-select'}),
             'notes': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
         }
+        help_texts = {
+            'patient': "Faqat davolanayotgan (faol) bemorlar ko'rsatiladi.",
+        }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

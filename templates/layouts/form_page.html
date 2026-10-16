@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% comment %}
+Barcha oddiy forma sahifalari uchun umumiy shablon.
+Bloklar: form_context (bemor/tahlil haqida panel), form_intro (izoh),
+form_fields (standart: crispy), cancel_url, submit_label.
+{% endcomment %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-xl-8 col-lg-10">
+        {% block form_context %}{% endblock %}
+        <div class="card">
+            <div class="card-body p-4">
+                {% block form_intro %}{% endblock %}
+                <form method="post" novalidate>
+                    {% csrf_token %}
+                    {% block form_fields %}{{ form|crispy }}{% endblock %}
+                    <div class="nm-form-actions">
+                        <a href="{% block cancel_url %}{% url 'dashboard' %}{% endblock %}" class="btn btn-soft">Bekor qilish</a>
+                        <button type="submit" class="btn btn-primary px-4">
+                            <i class="fa-solid fa-check me-1"></i>{% block submit_label %}Saqlash{% endblock %}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

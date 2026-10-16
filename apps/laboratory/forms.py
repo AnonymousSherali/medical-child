@@ -22,6 +22,10 @@ class LabTestForm(forms.ModelForm):
             ),
             'notes': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
         }
+        help_texts = {
+            'sample_collected_date': "Qon yoki likvor olingan vaqt.",
+            'test_date': "Tahlil bajarilgan vaqt. Namuna olingan vaqtdan oldin bo'lishi mumkin emas.",
+        }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -60,6 +64,11 @@ class NeuroProteinResultForm(forms.ModelForm):
             'reference_range_min': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.001'}),
             'reference_range_max': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.001'}),
             'interpretation': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
+        }
+        help_texts = {
+            'reference_range_min': "Laboratoriya hisobotidagi pastki chegara. Ixtiyoriy.",
+            'reference_range_max': "Laboratoriya hisobotidagi yuqori chegara. Ixtiyoriy.",
+            'interpretation': "Shifokor yoki laborant izohi (masalan, namuna gemolizlangan).",
         }
 
     def clean_value(self):

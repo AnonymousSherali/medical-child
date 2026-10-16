@@ -1,6 +1,7 @@
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
+from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
 from django.views import View
@@ -20,6 +21,13 @@ class LabTestListView(LoginRequiredMixin, ListView):
 
     def get_queryset(self):
         queryset = LabTest.objects.select_related('patient', 'ordered_by')
+        query = self.request.GET.get('q', '').strip()
+        if query:
+            queryset = queryset.filter(
+                Q(patient__first_name__icontains=query)
+                | Q(patient__last_name__icontains=query)
+                | Q(patient__medical_record_number__icontains=query)
+            )
         test_type = self.request.GET.get('test_type')
         if test_type:
             queryset = queryset.filter(test_type=test_type)
@@ -35,6 +43,7 @@ class LabTestListView(LoginRequiredMixin, ListView):
         context['test_types'] = LabTest.TEST_TYPE_CHOICES
         context['selected_type'] = self.request.GET.get('test_type', '')
         context['selected_status'] = self.request.GET.get('status', '')
+        context['query'] = self.request.GET.get('q', '')
         return context
 
 
